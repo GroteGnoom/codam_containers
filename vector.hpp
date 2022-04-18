@@ -24,7 +24,7 @@ class ra_iterator : general_iterator<std::random_access_iterator_tag, T, Distanc
 		typename base::pointer _pointer;
 	public:
 		ra_iterator(typename base::pointer p) : _pointer(p) {}
-		ra_iterator &operator+(long a) { //TODO: should work for non-int
+		ra_iterator &operator+(Distance a) {
 			_pointer += a;
 			return *this;
 		}
@@ -37,7 +37,7 @@ class ra_iterator : general_iterator<std::random_access_iterator_tag, T, Distanc
 			_pointer += 1;
 			return tmp;
 		}
-		ra_iterator &operator-(long a) { //TODO: should work for non-int
+		ra_iterator &operator-(Distance a) {
 			_pointer -= a;
 			return *this;
 		}
