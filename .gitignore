@@ -1,0 +1,13 @@
+*.o
+a.out
+my_*
+*.swp
+*.a
+*.~
+*.dSYM
+tags
+*.replace
+test.c
+output
+std_output
+containers
