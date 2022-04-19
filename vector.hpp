@@ -76,13 +76,6 @@ class vector {
 			}
 		};
 
-		iterator begin() {
-			return iterator(_data);
-		}
-		iterator end() {
-			return begin() + _size;
-		}
-
 		//range constructor
 		vector (ra_iterator<T, size_type> first, ra_iterator<T, size_type> last, const allocator_type& alloc = allocator_type()) :
 			_alloc(alloc), _size(last - first), _cap(_size), _data(_alloc.allocate(_cap)) {
@@ -90,6 +83,34 @@ class vector {
 				_data[i++] = *first;
 			}
 		};
+
+		//copy constructor
+		vector (const vector& v) : _alloc(v._alloc), _size(v._size), _cap(v._cap), _data(_alloc.allocate(_cap)) {
+			for (size_type i = 0; i < _size; i++) {
+				_data[i] = v._data[i];
+			}
+		}
+
+		~vector() {
+			if (_size) {
+				for (size_type i = 0; i < _size; i++) {
+					_data[i].~T();
+				}
+				_size = 0;
+			}
+			if (_data)
+			{
+				_alloc.deallocate(_data, _cap);
+				_data = NULL;
+				_cap = 0;
+			}
+		}
+		iterator begin() {
+			return iterator(_data);
+		}
+		iterator end() {
+			return begin() + _size;
+		}
 
 		
 		const T& operator[](const size_type idx) { return _data[idx]; }

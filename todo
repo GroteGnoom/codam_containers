@@ -1,5 +1,5 @@
 everything that's not implemented yet
 
 but first:
-fix leaks
+add copy constructor
 add tests for everything currently implemented

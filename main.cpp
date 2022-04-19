@@ -19,16 +19,50 @@ std::ostream &operator<<(std::ostream &out, const vector<T> &v) {
 	return out;
 }
 
+template <typename T>
+void print_vec(vector<T> v) {
+	std::cout << "v: " << v << "\n";
+}
+
 int main() {
-	vector<int> v;
+	std::cout << "Constructor 1: default constructor\n";
+	{
+		std::cout << "int: \n";
+		vector<int> v;
+		print_vec(v);
+	}
+	{
+		std::cout << "string: \n";
+		vector<std::string> v;
+		print_vec(v);
+	}
 
-	vector<int> v2(10);
-	vector<int> v3(10, 3);
-	vector<int> v4(v3.begin() + 1, v3.end() - 1);
-
-	std::cout << "v:" << v << "\n";
-	std::cout << "v2:" << v2 << "\n";
-	std::cout << "v3:" << v3 << "\n";
-	std::cout << "v4:" << v4 << "\n";
+	std::cout << "Constructor 2: fill constructor\n";
+	{
+		std::cout << "fill with 10 strings: \n";
+		vector<std::string> v(10);
+		print_vec(v);
+	}
+	{
+		std::cout << "fill with 10 ints: \n";
+		vector<int> v(10);
+		print_vec(v);
+	}
+	{
+		std::cout << "fill with 10 strings of \"bla\": \n";
+		vector<std::string> v(10, "bla");
+		print_vec(v);
+	}
+	{
+		std::cout << "fill with 0 strings of \"bla\": \n";
+		vector<std::string> v(0, "bla");
+		print_vec(v);
+	}
+	{
+		std::cout << "fill with 10 strings of \"bla\", then take 7: \n";
+		vector<std::string> v(10, "bla");
+		vector<std::string> v2(v.begin() + 2, v.end() - 1);
+		print_vec(v2);
+	}
 }
 
