@@ -11,6 +11,10 @@ else
 	FLAGS = -Wall -Wextra -Werror
 endif
 
+ifdef STD
+	FLAGS := $(FLAGS) -DSTD=1
+endif
+
 OBJ = $(SRC:.cpp=.o)
 
 all: $(NAME)

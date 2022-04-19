@@ -44,8 +44,17 @@ class ra_iterator : general_iterator<std::random_access_iterator_tag, T, Distanc
 		typename base::difference_type operator-(const ra_iterator &rai) {
 			return _pointer - rai._pointer;
 		}
+
 		bool operator<(const ra_iterator &rai) {
 			return _pointer < rai._pointer;
+		}
+
+		bool operator==(const ra_iterator &rai) {
+			return _pointer == rai._pointer;
+		}
+
+		bool operator>(const ra_iterator &rai) {
+			return _pointer > rai._pointer;
 		}
 
 		T &operator*() const {
@@ -74,15 +83,23 @@ class vector {
 			for (size_type i = 0; i < _size; i++) {
 				_data[i] = val;
 			}
-		};
+		}
 
 		//range constructor
 		vector (ra_iterator<T, size_type> first, ra_iterator<T, size_type> last, const allocator_type& alloc = allocator_type()) :
-			_alloc(alloc), _size(last - first), _cap(_size), _data(_alloc.allocate(_cap)) {
+			_alloc(alloc), _size(last - first), _cap(_size) {
+			if (first < last) {
+				_data = _alloc.allocate(_cap);
+			}
+			else if (first == last) {
+				return;
+			} else {
+				throw std::length_error("vector");
+			}
 			for (size_type i = 0; first < last; first++) {
 				_data[i++] = *first;
 			}
-		};
+		}
 
 		//copy constructor
 		vector (const vector& v) : _alloc(v._alloc), _size(v._size), _cap(v._cap), _data(_alloc.allocate(_cap)) {
