@@ -94,6 +94,9 @@ class vector {
 			else if (first == last) {
 				return;
 			} else {
+				_size = 0;
+				_cap = 0;
+				_data = NULL;
 				throw std::length_error("vector");
 			}
 			for (size_type i = 0; first < last; first++) {
@@ -122,14 +125,27 @@ class vector {
 				_cap = 0;
 			}
 		}
+
+		//copy assignment
+		vector &operator=(const vector& v) {
+			this->~vector<T>();
+			_alloc = v._alloc;
+			_size = v._size;
+			_cap = v._cap;
+			if (_cap)
+				_data = _alloc.allocate(_cap);
+			for (size_type i = 0; i < _size; i++) {
+				_data[i] = v._data[i];
+			}
+			return (*this);
+		}
+
 		iterator begin() {
 			return iterator(_data);
 		}
 		iterator end() {
 			return begin() + _size;
 		}
-
-		
 		const T& operator[](const size_type idx) { return _data[idx]; }
 		const T& operator[](const size_type idx) const { return _data[idx]; }
 		size_type size() const {return _size;}

@@ -87,5 +87,36 @@ int main() {
 		vector<std::string> v2(v);
 		print_vec(v2);
 	}
+	{
+		std::cout << "make empty vector and take a copy: \n";
+		vector<std::string> v(0);
+		vector<std::string> v2(v);
+		print_vec(v2);
+	}
+	std::cout << "\nCopy assignment\n";
+	{
+		std::cout << "fill with 10 strings of \"bla\" and take a copy: \n";
+		vector<std::string> v(10, "bla");
+		vector<std::string> v2;
+		v2 = v;
+		print_vec(v2);
+	}
+	{
+		std::cout << "make empty vector and take a copy: \n";
+		vector<std::string> v(0);
+		vector<std::string> v2;
+		v2 = v;
+		print_vec(v2);
+	}
+	std::cout << "\niterators\n";
+	{
+		std::cout << "fill with 10 numbers: \n";
+		vector<int> v(10);
+		for (int i = 0; i < 10; i++) {
+			v[i] = i;
+		}
+		std::cout << "begin: " << *v.begin() << "\n";
+		std::cout << "end: " << *(v.end() - 1) << "\n";
+	}
 }
 
