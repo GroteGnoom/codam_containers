@@ -66,8 +66,9 @@ template <typename T, typename Alloc = std::allocator<T> >
 class vector {
 	typedef T value_type;
 	typedef Alloc allocator_type;
-	typedef unsigned int size_type;
+	typedef size_t size_type;
 	typedef ra_iterator<T, size_type> iterator;
+	//typedef reverse_ra_iterator<T, size_type> reverse_iterator;
 	private:
 		allocator_type _alloc;
 		size_type _size;
@@ -79,7 +80,7 @@ class vector {
 		explicit vector (const allocator_type& alloc = allocator_type()) : _alloc(alloc), _size(0), _cap(0), _data(NULL) {};
 
 		//fill constructor
-		explicit vector (unsigned int n, const T& val = T(), const allocator_type& alloc = allocator_type()) : _alloc(alloc), _size(n), _cap(n), _data(_alloc.allocate(n)) {
+		explicit vector (size_type n, const T& val = T(), const allocator_type& alloc = allocator_type()) : _alloc(alloc), _size(n), _cap(n), _data(_alloc.allocate(n)) {
 			for (size_type i = 0; i < _size; i++) {
 				_data[i] = val;
 			}
@@ -92,6 +93,7 @@ class vector {
 				_data = _alloc.allocate(_cap);
 			}
 			else if (first == last) {
+				_data = NULL;
 				return;
 			} else {
 				_size = 0;
@@ -112,12 +114,15 @@ class vector {
 		}
 
 		~vector() {
+			resize(0);
+			/*
 			if (_size) {
 				for (size_type i = 0; i < _size; i++) {
 					_data[i].~T();
 				}
 				_size = 0;
 			}
+			*/
 			if (_data)
 			{
 				_alloc.deallocate(_data, _cap);
@@ -146,9 +151,20 @@ class vector {
 		iterator end() {
 			return begin() + _size;
 		}
-		const T& operator[](const size_type idx) { return _data[idx]; }
+		T& operator[](const size_type idx) { return _data[idx]; }
 		const T& operator[](const size_type idx) const { return _data[idx]; }
 		size_type size() const {return _size;}
+		size_type max_size() const {return std::numeric_limits<size_type>::max() / sizeof(T);}
+
+		void resize(size_type n, value_type val = value_type()) {
+			if (n < _size) {
+				for (size_type i = n; i < _size; i++) {
+					_data[i].~T();
+				}
+				_size = n;
+			}
+//TODO:  two to go
+		}
 };
 
 

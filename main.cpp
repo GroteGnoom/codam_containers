@@ -117,6 +117,23 @@ int main() {
 		}
 		std::cout << "begin: " << *v.begin() << "\n";
 		std::cout << "end: " << *(v.end() - 1) << "\n";
+		//TODO: std::cout << "rbegin: " << *(v.rbegin()) << "\n";
+		//TODO: std::cout << "rend: " << *(v.rend()) << "\n";
+	}
+	std::cout << "\nCapactiy:\n";
+	{
+		std::cout << "fill with 10 bla strings: \n";
+		vector<std::string> v(10, "bla");
+		std::cout << "size: " << v.size() << "\n";
+		std::cout << "max_size: " << v.max_size() << "\n";
+		std::cout << "resize to 2: \n";
+		v.resize(2);
+		std::cout << "v: " << v << "\n";
+		std::cout << "size: " << v.size() << "\n";
+		std::cout << "resize to 20: \n";
+		v.resize(20);
+		std::cout << "v: " << v << "\n";
+		std::cout << "size: " << v.size() << "\n";
 	}
 }
 
