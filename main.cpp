@@ -24,6 +24,15 @@ void print_vec(vector<T> v) {
 	std::cout << "v: " << v << "\n";
 }
 
+template <typename T>
+void capactiy_print(vector<T> &v) {
+	std::cout << "v: " << v << "\n";
+	std::cout << "size: " << v.size() << "\n";
+	std::cout << "max_size: " << v.max_size() << "\n";
+	std::cout << "capacity: " << v.capacity() << "\n";
+	std::cout << "empty: " << v.empty() << "\n";
+}
+
 int main() {
 	std::cout << "\nConstructor 1: default constructor\n";
 	{
@@ -124,16 +133,53 @@ int main() {
 	{
 		std::cout << "fill with 10 bla strings: \n";
 		vector<std::string> v(10, "bla");
-		std::cout << "size: " << v.size() << "\n";
-		std::cout << "max_size: " << v.max_size() << "\n";
+		capactiy_print(v);
 		std::cout << "resize to 2: \n";
 		v.resize(2);
-		std::cout << "v: " << v << "\n";
-		std::cout << "size: " << v.size() << "\n";
+		capactiy_print(v);
 		std::cout << "resize to 20: \n";
 		v.resize(20);
-		std::cout << "v: " << v << "\n";
-		std::cout << "size: " << v.size() << "\n";
+		capactiy_print(v);
+		std::cout << "resize to 0: \n";
+		v.resize(0);
+		capactiy_print(v);
+	}
+	std::cout << "\nCapactiy, reserve:\n";
+	{
+		std::cout << "fill with 10 bla strings: \n";
+		vector<std::string> v(10, "bla");
+		capactiy_print(v);
+		std::cout << "reserve to 2: \n";
+		v.reserve(2);
+		capactiy_print(v);
+		std::cout << "reserve to 20: \n";
+		v.reserve(20);
+		capactiy_print(v);
+		std::cout << "reserve to 0: \n";
+		v.reserve(0);
+		capactiy_print(v);
+	}
+	std::cout << "\nElement access";
+	{
+		std::cout << "fill with 10 bla strings: \n";
+		vector<std::string> v(10, "bla");
+		const vector<std::string> vc(10, "bla");
+		std::cout << "print const vec: \n";
+		print_vec(vc);
+		std::cout << "set 3: \n";
+		v[3] = "bloe";
+		print_vec(v);
+		std::cout << "set 5 with at: \n";
+		v.at(5) = "blie";
+		print_vec(v);
+		std::cout << "try to set 15 with at: \n";
+		try { 
+			v.at(15) = "blie";
+		} catch (std::out_of_range &e) {
+			std::cout << e.what() << "\n";
+		}
+		print_vec(v);
+
 	}
 }
 

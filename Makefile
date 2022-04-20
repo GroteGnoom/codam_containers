@@ -30,7 +30,7 @@ test:
 	./containers > std_output
 	$(MAKE) re DEBUG=1
 	./containers > output
-	diff std_output output
+	diff -a std_output output
 
 clean:
 	rm -f $(OBJ)

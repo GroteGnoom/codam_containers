@@ -115,14 +115,12 @@ class vector {
 
 		~vector() {
 			resize(0);
-			/*
 			if (_size) {
 				for (size_type i = 0; i < _size; i++) {
 					_data[i].~T();
 				}
 				_size = 0;
 			}
-			*/
 			if (_data)
 			{
 				_alloc.deallocate(_data, _cap);
@@ -133,7 +131,7 @@ class vector {
 
 		//copy assignment
 		vector &operator=(const vector& v) {
-			this->~vector<T>();
+			this->~vector<T>(); //TODO slower than necessary, could use old allocation if new size <= old cap
 			_alloc = v._alloc;
 			_size = v._size;
 			_cap = v._cap;
@@ -145,14 +143,17 @@ class vector {
 			return (*this);
 		}
 
+		//iterators
+
 		iterator begin() {
 			return iterator(_data);
 		}
 		iterator end() {
 			return begin() + _size;
 		}
-		T& operator[](const size_type idx) { return _data[idx]; }
-		const T& operator[](const size_type idx) const { return _data[idx]; }
+		//TODO: rbegin, rend
+		//Capacity
+
 		size_type size() const {return _size;}
 		size_type max_size() const {return std::numeric_limits<size_type>::max() / sizeof(T);}
 
@@ -162,9 +163,47 @@ class vector {
 					_data[i].~T();
 				}
 				_size = n;
+			} else {
+				reserve(n);
+				for (size_type i = _size; i < n; i++) {
+					_data[i] = val;
+				}
+				_size = n;
+				_cap = n;
 			}
-//TODO:  two to go
 		}
+		size_type capacity() const {return _cap;}
+		bool empty() { return !_size; }
+		void reserve(size_type n) {
+			if (n > max_size())
+				throw std::length_error("vector");
+			if (n > _cap) {
+				T* new_data = _alloc.allocate(n);
+				for (size_type i = 0; i < _size; i++) {
+					new_data[i] = _data[i];
+					_data[i].~T();
+				}
+				_alloc.deallocate(_data, _cap);
+				_data = new_data;
+				_cap = n;
+			}
+		}
+
+		//Element access:
+		T& operator[](const size_type idx) { return _data[idx]; }
+
+		const T& operator[](const size_type idx) const { return _data[idx]; }
+
+		//https://stackoverflow.com/questions/123758/how-do-i-remove-code-duplication-between-similar-const-and-non-const-member-func
+		T& at(const size_type n) {
+			return const_cast<T &>(const_cast <const vector<T> &> (*this).at(n));
+		}
+		const T& at (size_type n) const {
+			if (n < 0 || n >= _size)
+				throw std::out_of_range("vector");
+			return _data[n];
+		}
+
 };
 
 
