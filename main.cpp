@@ -179,7 +179,39 @@ int main() {
 			std::cout << e.what() << "\n";
 		}
 		print_vec(v);
-
+		std::cout << "front: " << v.front() << "\n";
+		std::cout << "const front: " << vc.front() << "\n";
+		std::cout << "back: " << v.back() << "\n";
+		std::cout << "const back: " << vc.back() << "\n";
+	}
+	std::cout << "\nModifiers";
+	{
+		std::cout << "fill with 10 bla strings: \n";
+		vector<std::string> v(10, "bla");
+		{
+			std::cout << "replace 3 string with bloe: \n";
+			vector<std::string> v2(3, "bloe");
+			v.assign(v2.begin(), v2.end());
+			print_vec(v);
+		}
+		{
+			std::cout << "replace 1 string with blie: \n";
+			vector<std::string> v2(1, "blie");
+			v.assign(v2.begin(), v2.end());
+			print_vec(v);
+		}
+		{
+			std::cout << "replace 20 string with blieoe: \n";
+			vector<std::string> v2(20, "blieoe");
+			v.assign(v2.begin(), v2.end());
+			print_vec(v);
+		}
+		{
+			std::cout << "replace add bleh and blah: \n";
+			v.push_back("bleh");
+			v.push_back("blah");
+			print_vec(v);
+		}
 	}
 }
 

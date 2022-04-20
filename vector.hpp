@@ -195,6 +195,7 @@ class vector {
 		const T& operator[](const size_type idx) const { return _data[idx]; }
 
 		//https://stackoverflow.com/questions/123758/how-do-i-remove-code-duplication-between-similar-const-and-non-const-member-func
+
 		T& at(const size_type n) {
 			return const_cast<T &>(const_cast <const vector<T> &> (*this).at(n));
 		}
@@ -203,7 +204,58 @@ class vector {
 				throw std::out_of_range("vector");
 			return _data[n];
 		}
+		T& front() {
+			//https://www.cplusplus.com/reference/vector/vector/front/
+			//Calling this function on an empty container causes undefined behavior.
+			return _data[0];
+		}
+		const T&front() const {
+			//https://www.cplusplus.com/reference/vector/vector/front/
+			//Calling this function on an empty container causes undefined behavior.
+			return _data[0];
+		}
+		T& back() {
+			//https://www.cplusplus.com/reference/vector/vector/back/
+			//Calling this function on an empty container causes undefined behavior.
+			return _data[_size - 1];
+		}
+		const T&back() const {
+			//https://www.cplusplus.com/reference/vector/vector/back/
+			//Calling this function on an empty container causes undefined behavior.
+			return _data[_size - 1];
+		}
 
+		//Modifiers
+		//
+		
+		template <class InputIterator>
+		void assign (InputIterator first, InputIterator last) {
+			if (!(first < last) && !(first == last)) {
+				throw std::length_error("vector");
+			}
+			resize(last - first);
+			for (size_type i = 0; first < last; first++) {
+				_data[i++] = *first;
+			}
+		}
+		void assign (size_type n, const value_type& val) {
+			resize(n);
+			for (size_type i = 0; i < n; i++) {
+				_data[i] = val;
+			}
+		}
+
+
+		void push_back (const value_type& val) {
+			if (_cap == _size) {
+				if (_cap * 2 <= max_size())
+					reserve(_cap * 2);
+				else
+					reserve(_cap + 1);
+			}
+			_data[_size] = val;
+			_size++;
+		}
 };
 
 
