@@ -277,15 +277,27 @@ class vector {
 		void insert (iterator position, size_type n, const value_type& val) {
 			size_type start = position - begin();
 			resize(_size + n);
-			for (size_type i = _size - 1; i >= _size - n ; i--) {
+			for (size_type i = _size - 1; i >= start + n; i--) {
 				_data[i] = _data[i - n];
 			}
 			for (size_type i = 0; i < n ; i++) {
 				(*this)[start + i] = val;
 			}
 		}
-};
 
+		template <class InputIterator>
+		void insert (iterator position, InputIterator first, InputIterator last) {
+			size_type start = position - begin();
+			size_type n = last - first;
+			resize(_size + n);
+			for (size_type i = _size - 1; i >= start + n; i--) {
+				_data[i] = _data[i - n];
+			}
+			for (size_type i = 0; i < n ; i++) {
+				(*this)[start + i] = *(first + i);
+			}
+		}
+};
 
 } //namespace ft
 #endif

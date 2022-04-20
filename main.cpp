@@ -240,6 +240,12 @@ int main() {
 			v.insert(v.begin(), 3, "wiii");
 			print_vec(v);
 		}
+		{
+			std::cout << "insert 3 waaa at index 0 via iterator\n";
+			vector<std::string> v2(10, "waaa");
+			v.insert(v.begin(), v2.begin() + 3, v2.end() - 4);
+			print_vec(v);
+		}
 	}
 }
 
