@@ -205,11 +205,39 @@ int main() {
 			vector<std::string> v2(20, "blieoe");
 			v.assign(v2.begin(), v2.end());
 			print_vec(v);
+			std::cout << "resize to 3, so it's more readable: \n";
+			v.resize(3);
 		}
 		{
-			std::cout << "replace add bleh and blah: \n";
+			std::cout << "add bleh and blah: \n";
 			v.push_back("bleh");
 			v.push_back("blah");
+			print_vec(v);
+		}
+		{
+			std::cout << "pop back\n";
+			v.pop_back();
+			print_vec(v);
+			std::cout << "pop back\n";
+			v.pop_back();
+			print_vec(v);
+		}
+		{
+			std::cout << "pop back\n";
+			v.pop_back();
+			print_vec(v);
+			std::cout << "pop back\n";
+			v.pop_back();
+			print_vec(v);
+		}
+		{
+			std::cout << "insert wioe at index 1\n";
+			v.insert(v.begin() + 1, "wioe");
+			print_vec(v);
+		}
+		{
+			std::cout << "insert 3 wiii at index 0\n";
+			v.insert(v.begin(), 3, "wiii");
 			print_vec(v);
 		}
 	}

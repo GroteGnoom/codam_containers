@@ -256,6 +256,34 @@ class vector {
 			_data[_size] = val;
 			_size++;
 		}
+		//If the container is not empty, the function never throws exceptions (no-throw guarantee).
+		//Otherwise, it causes undefined behavior.
+		void pop_back() {
+			resize(_size - 1);
+		}
+
+		iterator insert (iterator position, const value_type& val) {
+			iterator position_copy = position;
+			resize(_size + 1);
+			T s = val;
+			for (; position < end(); position++) {
+				T n = *position;
+				*position = s;
+				s = n;
+			}
+			return position_copy;
+		}
+
+		void insert (iterator position, size_type n, const value_type& val) {
+			size_type start = position - begin();
+			resize(_size + n);
+			for (size_type i = _size - 1; i >= _size - n ; i--) {
+				_data[i] = _data[i - n];
+			}
+			for (size_type i = 0; i < n ; i++) {
+				(*this)[start + i] = val;
+			}
+		}
 };
 
 
