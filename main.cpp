@@ -2,6 +2,8 @@
 #ifdef STD
 #include <vector>
 using namespace std;
+#include <iterator>
+#include <typeinfo>
 #else
 #include "vector.hpp"
 using namespace ft;
@@ -302,7 +304,10 @@ int main() {
 			v1.clear();
 			print_vec(v1);
 		}
-		{
+	}
+	std::cout << "\nModifiers";
+	{
+
 			std::cout << "allocator: \n";
 			vector<std::string> v1(5, "bla");
 			std::string *p;
@@ -318,31 +323,44 @@ int main() {
 				v1.get_allocator().destroy(p + i);
 			}
 			v1.get_allocator().deallocate(p, 3);
-		}
-		{
-			std::cout << "equal: \n";
-			check_compares(==);
-		}
-		{
-			std::cout << "not equal: \n";
-			check_compares(!=);
-		}
-		{
-			std::cout << "less than: \n";
-			check_compares(<);
-		}
-		{
-			std::cout << "less than or equal: \n";
-			check_compares(<=);
-		}
-		{
-			std::cout << "greater than \n";
-			check_compares(>);
-		}
-		{
-			std::cout << "greater than or equal: \n";
-			check_compares(>=);
-		}
+	}
+	std::cout << "\nNon-member function overloads\n";
+	{
+		std::cout << "equal: \n";
+		check_compares(==);
+	}
+	{
+		std::cout << "not equal: \n";
+		check_compares(!=);
+	}
+	{
+		std::cout << "less than: \n";
+		check_compares(<);
+	}
+	{
+		std::cout << "less than or equal: \n";
+		check_compares(<=);
+	}
+	{
+		std::cout << "greater than \n";
+		check_compares(>);
+	}
+	{
+		std::cout << "greater than or equal: \n";
+		check_compares(>=);
+	}
+
+	//vector<int>::iterator a(NULL);
+	vector<int>::value_type b;
+	//(void) a;
+	(void) b;
+
+	//typedef iterator_traits< vector<int *> > traits;
+	//if (typeid(traits::iterator_category)==typeid(std::random_access_iterator_tag))
+	//	std::cout << "int * is a random-access iterator";
+	typedef iterator_traits< vector<int>::iterator > traits;
+	if (typeid(traits::iterator_category)==typeid(random_access_iterator_tag)) {
+		std::cout << "vector<int>::iterator is a random-access iterator";
 	}
 }
 
