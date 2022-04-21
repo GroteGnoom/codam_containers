@@ -246,6 +246,16 @@ int main() {
 			v.insert(v.begin(), v2.begin() + 3, v2.end() - 4);
 			print_vec(v);
 		}
+		{
+			vector<int> v2(4);
+			v2[0] = 0;
+			v2[1] = 1;
+			v2[2] = 2;
+			v2[3] = 3;
+			std::cout << "erase elem 0\n";
+			v2.erase(v2.begin());
+			print_vec(v2);
+		}
 	}
 }
 

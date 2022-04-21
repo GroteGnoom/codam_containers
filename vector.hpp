@@ -24,9 +24,10 @@ class ra_iterator : general_iterator<std::random_access_iterator_tag, T, Distanc
 		typename base::pointer _pointer;
 	public:
 		ra_iterator(typename base::pointer p) : _pointer(p) {}
-		ra_iterator &operator+(Distance a) {
-			_pointer += a;
-			return *this;
+		ra_iterator operator+(Distance a) {
+			ra_iterator i = *this;
+			i._pointer += a;
+			return i;
 		}
 		ra_iterator &operator++() {
 			_pointer += 1;
@@ -37,9 +38,19 @@ class ra_iterator : general_iterator<std::random_access_iterator_tag, T, Distanc
 			_pointer += 1;
 			return tmp;
 		}
-		ra_iterator &operator-(Distance a) {
-			_pointer -= a;
+		ra_iterator &operator--() {
+			_pointer -= 1;
 			return *this;
+		}
+		ra_iterator &operator--(int) {
+			ra_iterator &tmp = *this;
+			_pointer -= 1;
+			return tmp;
+		}
+		ra_iterator operator-(Distance a) {
+			ra_iterator i = *this;
+			i._pointer -= a;
+			return i;
 		}
 		typename base::difference_type operator-(const ra_iterator &rai) {
 			return _pointer - rai._pointer;
@@ -51,6 +62,9 @@ class ra_iterator : general_iterator<std::random_access_iterator_tag, T, Distanc
 
 		bool operator==(const ra_iterator &rai) {
 			return _pointer == rai._pointer;
+		}
+		bool operator!=(const ra_iterator &rai) {
+			return _pointer != rai._pointer;
 		}
 
 		bool operator>(const ra_iterator &rai) {
@@ -296,6 +310,15 @@ class vector {
 			for (size_type i = 0; i < n ; i++) {
 				(*this)[start + i] = *(first + i);
 			}
+		}
+
+		iterator erase (iterator position) {
+			iterator position_copy = position;
+			_size --;
+			for (;position < end(); position++) {
+				*position = *(position + 1);
+			}
+			return position_copy;
 		}
 };
 
