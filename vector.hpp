@@ -24,7 +24,7 @@ class ra_iterator : general_iterator<std::random_access_iterator_tag, T, Distanc
 		typename base::pointer _pointer;
 	public:
 		ra_iterator(typename base::pointer p) : _pointer(p) {}
-		ra_iterator operator+(Distance a) {
+		ra_iterator operator+(Distance a) const {
 			ra_iterator i = *this;
 			i._pointer += a;
 			return i;
@@ -47,34 +47,29 @@ class ra_iterator : general_iterator<std::random_access_iterator_tag, T, Distanc
 			_pointer -= 1;
 			return tmp;
 		}
-		ra_iterator operator-(Distance a) {
+		ra_iterator operator-(Distance a) const {
 			ra_iterator i = *this;
 			i._pointer -= a;
 			return i;
 		}
-		typename base::difference_type operator-(const ra_iterator &rai) {
+		typename base::difference_type operator-(const ra_iterator &rai) const {
 			return _pointer - rai._pointer;
 		}
 
-		bool operator<(const ra_iterator &rai) {
-			return _pointer < rai._pointer;
-		}
-
-		bool operator==(const ra_iterator &rai) {
-			return _pointer == rai._pointer;
-		}
-		bool operator!=(const ra_iterator &rai) {
-			return _pointer != rai._pointer;
-		}
-
-		bool operator>(const ra_iterator &rai) {
-			return _pointer > rai._pointer;
-		}
+#define op(a) bool operator a (const ra_iterator &rai) const { return _pointer a rai._pointer; }
+		op(<)
+		op(>)
+		op(<=)
+		op(>=)
+		op(==)
+		op(!=)
+#undef op
 
 		T &operator*() const {
 			return *_pointer;
 		}
 };
+
 
 template <typename T, typename Alloc = std::allocator<T> >
 class vector {
@@ -130,10 +125,7 @@ class vector {
 		~vector() {
 			resize(0);
 			if (_size) {
-				for (size_type i = 0; i < _size; i++) {
-					_data[i].~T();
-				}
-				_size = 0;
+				clear();
 			}
 			if (_data)
 			{
@@ -162,9 +154,19 @@ class vector {
 		iterator begin() {
 			return iterator(_data);
 		}
+
+		const iterator begin() const {
+			return iterator(_data);
+		}
+
 		iterator end() {
 			return begin() + _size;
 		}
+
+		const iterator end() const {
+			return begin() + _size;
+		}
+
 		//TODO: rbegin, rend
 		//Capacity
 
@@ -320,7 +322,93 @@ class vector {
 			}
 			return position_copy;
 		}
+
+		iterator erase (iterator first, iterator last) {
+			for (;last < end(); last++) {
+				*first = *last;
+				first++;
+			}
+			_size -= (last-first);
+			return last - 1;
+		}
+		void swap (vector& x) {
+			std::swap(_alloc, x._alloc);
+			std::swap(_size, x._size);
+			std::swap(_cap, x._cap);
+			std::swap(_data, x._data);
+		}
+		void clear() {
+			for (size_type i = 0; i < _size; i++) {
+				_data[i].~T();
+			}
+			_size = 0;
+		}
+		allocator_type get_allocator() const {
+			return _alloc;
+		}
 };
+
+template <typename it1, typename it2>
+bool lexicographical_compare(it1 b1, it1 e1, it2 b2, it2 e2) {
+	while (true) {
+		if (b1 >= e1 && b2 >= e1)
+			return false;
+		if (b1 >= e1)
+			return true;
+		if (b2 >= e2)
+			return false;
+		if (*b1 < *b2)
+			return true;
+		if (*b1 > *b2)
+			return false;
+		b1++;
+		b2++;
+	}
+}
+
+template <typename it1, typename it2>
+bool equal(it1 b1, it1 e1, it2 b2, it2 e2) {
+	if (e1 - b1 != e2 - b2)
+		return false;
+	while (true) {
+		if (b1 >= e1)
+			return true;
+		if (*b1 != *b2)
+			return false;
+		b1++;
+		b2++;
+	}
+}
+
+template <class T, class Alloc>
+bool operator== (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs) {
+	return ft::equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+}
+
+template <class T, class Alloc>
+bool operator!= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs) {
+	return !(lhs == rhs);
+}
+
+template <class T, class Alloc>
+bool operator<  (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs) {
+	return ft::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+}
+
+template <class T, class Alloc>
+bool operator<= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs) {
+	return lhs < rhs || lhs == rhs;
+}
+
+template <class T, class Alloc>
+bool operator>  (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs) {
+	return !(lhs <= rhs);
+}
+
+template <class T, class Alloc>
+bool operator>= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs) {
+	return lhs > rhs || lhs == rhs;
+}
 
 } //namespace ft
 #endif

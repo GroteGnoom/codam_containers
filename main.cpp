@@ -33,6 +33,16 @@ void capactiy_print(vector<T> &v) {
 	std::cout << "empty: " << v.empty() << "\n";
 }
 
+#define check_compares(op) do { \
+	vector<std::string> v1(5, "bla"); \
+	vector<std::string> v2(4, "bla"); \
+	std::cout << "one is shorter: " << (v1 op v2) << "\n"; \
+	v2.push_back("ble"); \
+	std::cout << "last string is not equal: " << (v1 op v2) << "\n"; \
+	v2[4] = "bla"; \
+	std::cout << "equal: " << (v1 op v2) << "\n"; \
+} while (0) \
+
 int main() {
 	std::cout << "\nConstructor 1: default constructor\n";
 	{
@@ -255,6 +265,83 @@ int main() {
 			std::cout << "erase elem 0\n";
 			v2.erase(v2.begin());
 			print_vec(v2);
+		}
+		{
+			vector<int> v2(4);
+			v2[0] = 0;
+			v2[1] = 1;
+			v2[2] = 2;
+			v2[3] = 3;
+			std::cout << "erase elem 1 and 2\n";
+			std::cout << *v2.erase(v2.begin() + 1, v2.end() - 1) << "\n";
+			print_vec(v2);
+		}
+		{
+			vector<int> v1(4);
+			v1[0] = 0;
+			v1[1] = 1;
+			v1[2] = 2;
+			v1[3] = 3;
+			vector<int> v2(4);
+			v2[0] = 4;
+			v2[1] = 5;
+			v2[2] = 6;
+			v2[3] = 7;
+			int *i = &v1[0];
+			std::cout << "before swap: " << *i << "\n";
+			print_vec(v1);
+			print_vec(v2);
+			v1.swap(v2);
+			std::cout << "after swap: " << *i << "\n";
+			print_vec(v1);
+			print_vec(v2);
+		}	
+		{
+			std::cout << "clear: \n";
+			vector<std::string> v1(5, "bla");
+			v1.clear();
+			print_vec(v1);
+		}
+		{
+			std::cout << "allocator: \n";
+			vector<std::string> v1(5, "bla");
+			std::string *p;
+			p = v1.get_allocator().allocate(3);
+			for (int i = 0; i < 3; i++) {
+				v1.get_allocator().construct(p + i, "jaja ");
+			}
+			for (int i = 0; i < 3; i++) {
+				std::cout << p[i];
+			}
+			std::cout << "\n";
+			for (int i = 0; i < 3; i++) {
+				v1.get_allocator().destroy(p + i);
+			}
+			v1.get_allocator().deallocate(p, 3);
+		}
+		{
+			std::cout << "equal: \n";
+			check_compares(==);
+		}
+		{
+			std::cout << "not equal: \n";
+			check_compares(!=);
+		}
+		{
+			std::cout << "less than: \n";
+			check_compares(<);
+		}
+		{
+			std::cout << "less than or equal: \n";
+			check_compares(<=);
+		}
+		{
+			std::cout << "greater than \n";
+			check_compares(>);
+		}
+		{
+			std::cout << "greater than or equal: \n";
+			check_compares(>=);
 		}
 	}
 }
