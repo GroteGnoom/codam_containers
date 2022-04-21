@@ -95,6 +95,16 @@ class iterator_traits<T*> {
 		typedef random_access_iterator_tag iterator_category;
 };
 
+template <class T>
+class iterator_traits<const T*> {
+	public:
+		typedef std::ptrdiff_t difference_type;
+		typedef T value_type;
+		typedef const T* pointer;
+		typedef const T& reference;
+		typedef random_access_iterator_tag iterator_category;
+};
+
 template <typename T, typename Alloc = std::allocator<T> >
 class vector {
 	public:
