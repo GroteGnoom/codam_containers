@@ -255,12 +255,11 @@ class vector {
 	}
 
 	//Element access:
-	T& operator[](const size_type idx) { return _data[idx]; }
+	T& operator[](size_type idx) { return _data[idx]; }
 
-	const T& operator[](const size_type idx) const { return _data[idx]; }
+	const T& operator[](size_type idx) const { return _data[idx]; }
 
 	//https://stackoverflow.com/questions/123758/how-do-i-remove-code-duplication-between-similar-const-and-non-const-member-func
-
 	T& at(const size_type n) {
 		return const_cast<T &>(const_cast <const vector<T> &> (*this).at(n));
 	}
@@ -464,7 +463,12 @@ void swap (vector<T,Alloc>& x, vector<T,Alloc>& y) {
 	x.swap(y);
 }
 
+// this makes a templated struct. so enable_if<Cond, T>
+template<bool Cond, class T = void> struct enable_if {};
 
+//This one only matches if Cond is trye. That means type will get typedefd to T, so you have to put the enable_if::type in place of your normal type
+// if the condition is not true the typedef will not happen, and the compler will look for other functions
+template<class T> struct enable_if<true, T> { typedef T type; };
 
 } //namespace ft
 #endif

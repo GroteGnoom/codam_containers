@@ -1,12 +1,14 @@
 
 #ifdef STD
-#include <vector>
-using namespace std;
-#include <iterator>
-#include <typeinfo>
+#	include <vector>
+	using namespace std;
+#	include <iterator>
+#	include <typeinfo>
+#	include <map>
 #else
-#include "vector.hpp"
-using namespace ft;
+#	include "vector.hpp"
+#	include "map.hpp"
+	using namespace ft;
 #endif
 
 #include <iostream>
@@ -45,10 +47,6 @@ void capactiy_print(vector<T> &v) {
 	std::cout << "equal: " << (v1 op v2) << "\n"; \
 } while (0) \
 
-
-template <class T>
-typename std::enable_if<std::is_integral<T>::value,bool>::type
-  is_odd (T i) {return bool(i%2);}
 
 static void con_def_ass() {
 	std::cout << "\nConstructor 1: default constructor\n";
@@ -398,7 +396,6 @@ static void non_member() {
 		std::cout << "5 blas:\n";
 		print_vec(v3);
 	}
-	//TODO
 }
 
 static void it_traits() {
@@ -417,11 +414,30 @@ static void it_traits() {
 	//	std::cout << "int * is a random-access iterator";
 	typedef iterator_traits< vector<int>::iterator > traits;
 	if (typeid(traits::iterator_category)==typeid(random_access_iterator_tag)) {
-		std::cout << "vector<int>::iterator is a random-access iterator";
+		std::cout << "vector<int>::iterator is a random-access iterator\n";
 	}
 }
 
-int main() {
+template <class T>
+typename enable_if<std::is_integral<T>::value,bool>::type
+  is_odd (T i) {return bool(i%2);}
+
+
+template <class T>
+typename enable_if<!std::is_integral<T>::value,bool>::type
+  is_odd (T i) {std::cout << i << " is not integral\n"; return false;}
+
+void check_enable_if() {
+	std::cout << "enable if: \n";
+	double a = 2;
+	std::cout << "double should give a warning and false: \n";
+	std::cout << is_odd(a) << "\n";
+	int b = 2;
+	std::cout << "int should give false: \n";
+	std::cout << is_odd(b) << "\n";
+}
+
+void typedefs() {
 #define check_type(a) do {(void)sizeof(vector<int>::a);} while (0)
 	check_type(value_type);
 	check_type(allocator_type);
@@ -436,6 +452,10 @@ int main() {
 	check_type(difference_type);
 	check_type(size_type);
 #undef check_type
+}
+
+void test_vector() {
+	typedefs();
 	con_def_ass();
 	iter();
 	capacity();
@@ -444,5 +464,20 @@ int main() {
 	alloc();
 	non_member();
 	it_traits();
+	check_enable_if();
+}
+
+void test_map() {
+#define check_type(a) do {(void)sizeof(map<std::string, int>::a);} while (0)
+	check_type(key_type);
+	check_type(mapped_type);
+	check_type(value_type);
+	check_type(key_compare);
+#undef check_type
+}
+
+int main() {
+	test_vector();
+	test_map();
 }
 

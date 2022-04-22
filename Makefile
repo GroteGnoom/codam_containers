@@ -1,6 +1,6 @@
 NAME = containers
 SRC = main.cpp
-INC = vector.hpp
+INC = vector.hpp map.hpp
 
 ifdef DEBUG
 	CC=clang++
