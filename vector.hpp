@@ -116,6 +116,9 @@ class vector {
 	typedef const T* const_pointer;
 	typedef size_t size_type;
 	typedef ra_iterator<T, size_type> iterator;
+	typedef const iterator const_iterator;
+	//typedef reverse_iterator //TODO
+	typedef ptrdiff_t difference_type; //TODO is it always ptrdiff?
 	//typedef reverse_ra_iterator<T, size_type> reverse_iterator;
 	//
 	private:
@@ -232,6 +235,11 @@ class vector {
 	size_type capacity() const {return _cap;}
 	bool empty() { return !_size; }
 	void reserve(size_type n) {
+		if (!_data) {
+			_cap = n;
+			_data = _alloc.allocate(_cap);
+			return;
+		}
 		if (n > max_size())
 			throw std::length_error("vector");
 		if (n > _cap) {
@@ -305,8 +313,8 @@ class vector {
 
 	void push_back (const value_type& val) {
 		if (_cap == _size) {
-			if (_cap * 2 <= max_size())
-				reserve(_cap * 2);
+			if (_cap * 2 + 1 <= max_size())
+				reserve(_cap * 2 + 1);
 			else
 				reserve(_cap + 1);
 		}
@@ -450,6 +458,13 @@ template <class T, class Alloc>
 bool operator>= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs) {
 	return lhs > rhs || lhs == rhs;
 }
+
+template <class T, class Alloc>
+void swap (vector<T,Alloc>& x, vector<T,Alloc>& y) {
+	x.swap(y);
+}
+
+
 
 } //namespace ft
 #endif

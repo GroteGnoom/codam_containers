@@ -1,9 +1,8 @@
 everything that's not implemented yet
 
 but first:
-add copy constructor
-add tests for everything currently implemented
+enable_if
 
-Any function implementation put in a header file (except for function templates) means 0 to the exercise.
+Any function implementation put in a header file (except for function templates) means 0 to the exercise?
 
 checking NULL from allocator?
