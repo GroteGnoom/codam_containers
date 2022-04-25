@@ -8,3 +8,4 @@ Any function implementation put in a header file (except for function templates)
 checking NULL from allocator?
 
 know what explicit means
+
