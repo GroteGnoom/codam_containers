@@ -6,3 +6,5 @@ map stack set
 Any function implementation put in a header file (except for function templates) means 0 to the exercise?
 
 checking NULL from allocator?
+
+know what explicit means

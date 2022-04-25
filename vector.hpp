@@ -4,21 +4,13 @@
 #include <cstddef> //NULL
 #include <memory> /* allocator */
 #include <iostream>
+#include "iterator.hpp"
 
 namespace ft {
 
 struct random_access_iterator_tag {};
 
-template <class Category, class T, class Distance = ptrdiff_t,
-          class Pointer = T*, class Reference = T&>
-struct general_iterator {
-	public:
-		typedef T         value_type;
-		typedef Distance  difference_type;
-		typedef Pointer   pointer;
-		typedef Reference reference;
-		typedef Category  iterator_category;
-};
+
 
 template <typename T, typename Distance>
 class ra_iterator : public general_iterator<random_access_iterator_tag, T, Distance> {

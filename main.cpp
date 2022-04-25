@@ -473,11 +473,40 @@ void test_map() {
 	check_type(mapped_type);
 	check_type(value_type);
 	check_type(key_compare);
+	check_type(value_compare);
+	check_type(allocator_type);
+	check_type(reference);
+	check_type(const_reference);
+	check_type(pointer);
+	check_type(const_pointer);
 #undef check_type
 }
 
-int main() {
-	test_vector();
-	test_map();
+template <class T>
+void print_avl(Avlnode<T> *a , int spaces ) {
+	if (!a) return;
+	print_avl(a->_right, spaces + 5 );
+	for (int i = 1; i <= spaces; ++i ) {
+		std::cout << " ";
+	}
+	std::cout << a->_elem << "\n";
+	print_avl( a->_left, spaces + 5 );
 }
 
+void test_avl() {
+	Avltree<int> a;
+
+	a.insert(3);
+	a.insert(7);
+	a.insert(5);
+	a.insert(9);
+	a.insert(1);
+
+	print_avl(a._root, 0);
+}
+
+int main() {
+	test_avl();
+	//test_vector();
+	//test_map();
+}
