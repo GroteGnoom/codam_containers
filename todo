@@ -9,3 +9,9 @@ checking NULL from allocator?
 
 know what explicit means
 
+
+remove assertions
+do TODOs
+
+up next:
+	now rewriting my Avltree to use a pointer to the root node. It's a bit messy, because the nodes methods still assume they can be accessed from anywhere.

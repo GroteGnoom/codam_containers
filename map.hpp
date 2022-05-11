@@ -1,6 +1,8 @@
 #ifndef MAP_HPP
 #define MAP_HPP
-
+#include <algorithm> /*max*/
+#include <iostream> //TODO remove
+#include <assert.h> //TODO remove
 #include <cstddef>
 #include <memory> /* allocator */
 namespace ft {
@@ -15,22 +17,29 @@ struct Avlnode {
 	Avlnode *_left;
 	Avlnode *_right;
 	Avlnode *_parent;
-	int height;
 	Avlnode(T elem, Avlnode<T> *parent) {
 		_left = NULL;
 		_right = NULL;
 		_parent = parent;
 		_elem = elem;
 	}
-	static int get_height(Avlnode *node) {
-		if (node)
-			return node->height;
-		return 0;
+	int get_height() const {
+		int lheight = 0;
+		int rheight = 0;
+		if (_left)
+			lheight = _left->get_height();
+		if (_right)
+			rheight = _right->get_height();
+		return 1 + std::max(lheight, rheight);
 	}
-	void set_height() {
-		height = get_height(_left) + get_height(_right);
-		if (_parent)
-			_parent->set_height();
+	int get_balance() const {
+		int lheight = 0;
+		int rheight = 0;
+		if (_left)
+			lheight = _left->get_height();
+		if (_right)
+			rheight = _right->get_height();
+		return lheight - rheight;
 	}
 	Avlnode *root() {
 		Avlnode *a = this;;
@@ -41,6 +50,7 @@ struct Avlnode {
 	void left_rotate() {
 		Avlnode *x = this;
 		Avlnode *y = _right;
+		Avlnode *parent = _parent;
 		/*
 		if (!y) return;
 		if (y->left) {
@@ -65,50 +75,61 @@ struct Avlnode {
 		y->_left = x;
 		y->_parent = x->_parent;
 		x->_parent = y;
-		x->set_height();
-		y->set_height();
+		if (parent)
+		{
+			if (parent->_left == this) {
+				parent->_left = y;
+			} else {
+				parent->_right = y;
+			}
+		}
 	}
 	void right_rotate() {
-		Avlnode *x = this;
-		Avlnode *y = _left;
-		if (!y) return;
-		x->_left = y->_right;
-		y->_right = x;
-		y->_parent = x->_parent;
-		x->_parent = y;
-		x->set_height();
-		y->set_height();
+		Avlnode *parent = _parent;
+		Avlnode *y = this;
+		Avlnode *x = _left;
+		if (!x) return;
+		y->_left = x->_right;
+		x->_right = y;
+		x->_parent = y->_parent;
+		y->_parent = x;
+		if (parent)
+		{
+			if (parent->_left == this) {
+				parent->_left = x;
+			} else {
+				parent->_right = x;
+			}
+		}
 	}
-	/*helper function for insert*/
-	void insert2(T elem) {
+	Avlnode<T> *insert(T elem) {
 		if (elem < _elem) {
 			if (_left) {
-				_left->insert2(elem);
+				return _left->insert(elem);
 			}
 			else {
 				_left = new Avlnode(elem, this);
-				_left->set_height();
+				return _left;
 			}
 		} else {
 			if (_right)
-				_right->insert2(elem);
+				return _right->insert(elem);
 			else {
 				_right = new Avlnode(elem, this);
-				_right->set_height();
+				return _right;
 			}
 		}
 	}
-	void insert(T elem) {
-		root()->insert2(elem);
-	}
-	void del() {
+	void del_children() {
 		if (_left) {
-			_left->del();
+			_left->del_children();
 			delete _left;
+			_left = NULL;
 		}
 		if (_right) {
-			_right->del();
+			_right->del_children();
 			delete _right;
+			_right = NULL;
 		}
 	}
 };
@@ -122,14 +143,44 @@ class Avltree {
 			if (!_root) {
 				_root = new Avlnode<T>(elem, NULL);
 			} else {
-				_root->insert(elem);
+				Avlnode<T> *new_node = _root->insert(elem);
+				_root = _root->root();
+				rebalance(new_node);
 				_root = _root->root();
 			}
 		}
 		~Avltree() {
-			_root->del();
+			_root->del_children();
 			delete _root;
-			_root = 0;
+			_root = NULL;
+		}
+	private:
+		void rebalance(Avlnode<T> *new_node) {
+			int balance;
+			Avlnode<T> *parent = new_node->_parent;
+			if (!parent) return;
+			Avlnode<T> *grandparent = parent->_parent;
+			if (!grandparent) return;
+			balance = grandparent->get_balance();
+			//std::cout << "balance" << balance << "\n";
+			if (balance > 1) {
+				if (new_node->_elem < parent->_elem) {
+					return grandparent->right_rotate();
+				} else {
+					parent->left_rotate();
+					return grandparent->right_rotate();
+				}
+			} else if (balance < -1)  {
+				//std::cout << "right is longer\n";
+				if (new_node->_elem > parent->_elem) {
+					//std::cout << "doing left rotate\n";
+					return grandparent->left_rotate();
+				} else {
+					//std::cout << "doing right left rotate\n";
+					parent->right_rotate();
+					return grandparent->left_rotate();
+				}
+			}
 		}
 };
 
