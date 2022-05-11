@@ -79,6 +79,7 @@ struct Avlnode {
 		x->set_height();
 		y->set_height();
 	}
+	/*helper function for insert*/
 	void insert2(T elem) {
 		if (elem < _elem) {
 			if (_left) {

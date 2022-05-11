@@ -1,0 +1,16 @@
+allocate(-2) is a very bad idea, especially during initialization. I have never seen such a mess before.
+
+
+This is a copy assignment:
+		vector<std::string> v2;
+		v2 = v;
+this is a copy constructor
+		vector<std::string> v2 = v;
+They are not the same!
+
+There is a difference between a vector and a copy, because the capacities are not the same. For the copy, the capacity is the same as the size;
+
+With iterator traits you can see the internally use types of an intance. Usually your types are public and you can use your class to access them, but that's different from using an instance to access them. For instances you need iterator traits.
+
+For pointers you have to handle iterator traits separately, and you can check if something is a pointer with a template specialisation.
+
