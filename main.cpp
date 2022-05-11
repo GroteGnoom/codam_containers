@@ -479,12 +479,20 @@ void test_map() {
 	check_type(const_reference);
 	check_type(pointer);
 	check_type(const_pointer);
+	check_type(iterator);
+	check_type(const_iterator);
+	// TODO check_type(reverse_iterator);
+	// TODO check_type(const_reverse_iterator);
+	check_type(difference_type);
+	check_type(size_type);
 #undef check_type
+	map<std::string, int> m;
+	m.insert(pair<std::string, int>("hoi", 5));
 }
 
 
 
 int main() {
 	test_vector();
-	//test_map();
+	test_map();
 }

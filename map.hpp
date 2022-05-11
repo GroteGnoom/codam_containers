@@ -7,9 +7,47 @@
 #include <memory> /* allocator */
 namespace ft {
 
+struct bidirectional_iterator_tag {};
+
+template <typename T, typename Distance>
+class bi_iterator : public general_iterator<bidirectional_iterator_tag, T, Distance> {
+	typedef general_iterator<bidirectional_iterator_tag, T, Distance> base;
+	private:
+		typename base::pointer _pointer;
+	public:
+		bi_iterator(typename base::pointer p) : _pointer(p) {}
+		//TODO operations
+};
 
 template <class T1, class T2>
-struct pair{};
+struct pair{
+	public:
+	typedef T1 first_type;
+	typedef T2 second_type;
+	T1 first;
+	T2 second;
+	pair() : first(), second() {};
+
+	template<class U, class V>
+	pair (const pair<U,V>& pr) : first(pr.first), second(pr.second) {};
+	pair (const first_type& a, const second_type& b) : first(a), second(b) {};
+};
+
+template <class T1, class T2>
+bool operator== (const pair<T1,T2>& a, const pair<T1,T2>& b) {return a.first == b.first
+	&& a.second == b.second;}
+template <class T1, class T2>
+bool operator!= (const pair<T1,T2>& a, const pair<T1,T2>& b) {return !(a==b);}
+//This does a lexicographical comparison, or because there's only two, it checks the first, then the second
+template <class T1, class T2>
+bool operator< (const pair<T1,T2>& a, const pair<T1,T2>& b) {return (a.first<b.first) || (a.first==b.first && a.second < b.second);}
+//The rest follows from equality and less than
+template <class T1, class T2>
+bool operator<= (const pair<T1,T2>& a, const pair<T1,T2>& b) { return !(b<a); }
+template <class T1, class T2>
+ bool operator>  (const pair<T1,T2>& a, const pair<T1,T2>& b) { return b<a; }
+template <class T1, class T2>
+ bool operator>= (const pair<T1,T2>& a, const pair<T1,T2>& b) { return !(a<b); }
 
 template <class T>
 struct Avlnode {
@@ -150,9 +188,19 @@ class Avltree {
 			}
 		}
 		~Avltree() {
+			if (!_root) return;
 			_root->del_children();
 			delete _root;
 			_root = NULL;
+		}
+		T* begin() {
+			if (!_root) return NULL;
+			Avlnode<T> *search = _root;
+
+			while (search->_left) {
+				search = search->left;
+			}
+			return search;
 		}
 	private:
 		void rebalance(Avlnode<T> *new_node) {
@@ -201,17 +249,41 @@ class map {
 	typedef typename allocator_type::const_reference const_reference;
 	typedef typename allocator_type::pointer pointer;
 	typedef typename allocator_type::const_pointer const_pointer;
-	//TODO iterator
-	//TODO const_iterator
-	//TODO reverse_itarator
-	//TODO const_reverse_iterator
 	typedef std::ptrdiff_t difference_type;
 	typedef size_t size_type;
-
+	typedef bi_iterator<value_type, size_type> iterator;
+	typedef const bi_iterator<value_type, size_type> const_iterator;
+	//TODO reverse_itarator
+	//TODO const_reverse_iterator
+	private:
+	Avltree<value_type> _tree;
+	key_compare _comp;
+	allocator_type _alloc;
+	public:
 	explicit map (const key_compare& comp = key_compare(),
-			const allocator_type& alloc = allocator_type()); //TODO 
+			const allocator_type& alloc = allocator_type()) : _comp(comp), _alloc(alloc) {};
+	~map() {};
+	// TODO template <class InputIterator>
+	//	map (InputIterator first, InputIterator last,
+	//			const key_compare& comp = key_compare(),
+	//			const allocator_type& alloc = allocator_type());	
+	// TODO map (const map& x);
+ //map& operator= (const map& x);
+	iterator begin() {return _tree.begin();};
+	const_iterator begin() const {return _tree.begin();};
+
+	//Modifiers
+	pair<iterator,bool> insert (const value_type& val) {
+		iterator already_exists = _tree.find(val);
+		if (already_exists) {
+			pair<iterator, bool> retval(already_exists, false);
+			return retval;
+		}
+		pair<iterator, bool> retval(already_exists, false);
+		return retval;
+	}
 
 
-};
-}
+}; //map
+} //namespace
 #endif
