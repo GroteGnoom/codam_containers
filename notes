@@ -1,6 +1,6 @@
 go:
 	make tests runs tests, and shows a bit of an avl tree
-
+	
 
 allocate(-2) is a very bad idea, especially during initialization. I have never seen such a mess before.
 
@@ -19,3 +19,5 @@ With iterator traits you can see the internally use types of an intance. Usually
 For pointers you have to handle iterator traits separately, and you can check if something is a pointer with a template specialisation.
 
 https://www.programiz.com/dsa/avl-tree
+
+My avltree is general, it takes <T>, but that doesn't work. Because sometimes it needs to find a key. That doesn't make sense if it doesn't know it has pairs? Or I could make a function that only works for pairs. Or I could passin the compare?

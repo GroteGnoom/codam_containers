@@ -12,6 +12,8 @@ know what explicit means
 
 remove assertions
 do TODOs
+remove all new's that should be allocs
 
 up next:
-	now rewriting my Avltree to use a pointer to the root node. It's a bit messy, because the nodes methods still assume they can be accessed from anywhere.
+	max_size, the whole list
+	avl tree should use the map allocator

@@ -486,10 +486,15 @@ void test_map() {
 	check_type(difference_type);
 	check_type(size_type);
 #undef check_type
-	map<std::string, int> m;
-	m.insert(pair<std::string, int>("hoi", 5));
+	{
+		std::cout << "Capacity\n";
+		map<std::string, int> m;
+		std::cout << "Is empty map empty? " << m.empty() << "\n";
+		std::cout << "What is its size?" << m.size() << "\n";
+		m.insert(pair<std::string, int>("hoi", 5));
+		std::cout << "Is non-empty map empty? " << m.empty() << "\n";
+	}
 }
-
 
 
 int main() {

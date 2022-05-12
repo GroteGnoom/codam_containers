@@ -5,6 +5,7 @@
 #include <assert.h> //TODO remove
 #include <cstddef>
 #include <memory> /* allocator */
+#include "iterator.hpp"
 namespace ft {
 
 struct bidirectional_iterator_tag {};
@@ -16,6 +17,8 @@ class bi_iterator : public general_iterator<bidirectional_iterator_tag, T, Dista
 		typename base::pointer _pointer;
 	public:
 		bi_iterator(typename base::pointer p) : _pointer(p) {}
+	bool operator == (const bi_iterator &bii) const { return _pointer == bii._pointer; }
+	bool operator != (const bi_iterator &bii) const { return _pointer != bii._pointer; }
 		//TODO operations
 };
 
@@ -29,10 +32,16 @@ struct pair{
 	pair() : first(), second() {};
 
 	template<class U, class V>
-	pair (const pair<U,V>& pr) : first(pr.first), second(pr.second) {};
-	pair (const first_type& a, const second_type& b) : first(a), second(b) {};
+	pair (const pair<U,V>& pr) : first(pr.first), second(pr.second) {}
+	pair (const first_type& a, const second_type& b) : first(a), second(b) {}
+	pair &operator=(const pair<T1, T2> &p) {
+		first = p.first;
+		second= p.second;
+	}
 };
 
+//TODO can't I generalize this? you only need less than, and then you're done.
+// if a < b || b < a they're not equal, or if !(a<b) && !(b<a) they're equal
 template <class T1, class T2>
 bool operator== (const pair<T1,T2>& a, const pair<T1,T2>& b) {return a.first == b.first
 	&& a.second == b.second;}
@@ -49,18 +58,13 @@ template <class T1, class T2>
 template <class T1, class T2>
  bool operator>= (const pair<T1,T2>& a, const pair<T1,T2>& b) { return !(a<b); }
 
-template <class T>
+template <class T, class Compare = std::less<T>, class Alloc = std::allocator<T> >
 struct Avlnode {
 	T _elem;
 	Avlnode *_left;
 	Avlnode *_right;
 	Avlnode *_parent;
-	Avlnode(T elem, Avlnode<T> *parent) {
-		_left = NULL;
-		_right = NULL;
-		_parent = parent;
-		_elem = elem;
-	}
+	Avlnode(T elem, Avlnode<T, Compare> *parent) : _elem(elem), _left(NULL), _right(NULL), _parent(parent) {}
 	int get_height() const {
 		int lheight = 0;
 		int rheight = 0;
@@ -140,8 +144,8 @@ struct Avlnode {
 			}
 		}
 	}
-	Avlnode<T> *insert(T elem) {
-		if (elem < _elem) {
+	Avlnode<T, Compare> *insert(T elem) {
+		if (Compare()(elem, _elem)) {
 			if (_left) {
 				return _left->insert(elem);
 			}
@@ -170,21 +174,45 @@ struct Avlnode {
 			_right = NULL;
 		}
 	}
+	T* find(T a) {
+		if (Compare()(a, _elem)){
+			if (!_left)
+				return NULL;
+			return _left->find(a);
+		} else if (Compare()(_elem, a)){
+			if (!_right)
+				return NULL;
+			return _right->find(a);
+		} else {
+			return &_elem;
+		}
+	}
+	size_t size() {
+		size_t lsize = 0;
+		size_t rsize = 0;
+		if (_left)
+			lsize = _left->size();
+		if (_right)
+			rsize = _right->size();
+		return 1 + lsize + rsize;
+	}
 };
 
-template <class T>
+template <class T, class Compare = std::less<T>, class Alloc = std::allocator<T> >
 class Avltree {
 	public:
-		Avlnode<T> *_root;
+		Avlnode<T, Compare> *_root;
 		Avltree() : _root(NULL) {}
-		void insert(T elem) {
+		T* insert(T elem) {
 			if (!_root) {
-				_root = new Avlnode<T>(elem, NULL);
+				_root = new Avlnode<T, Compare>(elem, NULL);
+				return &_root->_elem;
 			} else {
-				Avlnode<T> *new_node = _root->insert(elem);
+				Avlnode<T, Compare> *new_node = _root->insert(elem);
 				_root = _root->root();
 				rebalance(new_node);
 				_root = _root->root();
+				return &new_node->_elem;
 			}
 		}
 		~Avltree() {
@@ -195,19 +223,31 @@ class Avltree {
 		}
 		T* begin() {
 			if (!_root) return NULL;
-			Avlnode<T> *search = _root;
+			Avlnode<T, Compare> *search = _root;
 
 			while (search->_left) {
-				search = search->left;
+				search = search->_left;
 			}
-			return search;
+			return &(search->_elem);
+		}
+		T* end() {
+			if (!_root) return begin();
+			Avlnode<T, Compare> *search = _root;
+
+			while (search->_right) {
+				search = search->_right;
+			}
+			return &(search->_elem) + 1;
+		}
+		T* find(T a) {
+			return _root->find(a);
 		}
 	private:
-		void rebalance(Avlnode<T> *new_node) {
+		void rebalance(Avlnode<T, Compare> *new_node) {
 			int balance;
-			Avlnode<T> *parent = new_node->_parent;
+			Avlnode<T, Compare> *parent = new_node->_parent;
 			if (!parent) return;
-			Avlnode<T> *grandparent = parent->_parent;
+			Avlnode<T, Compare> *grandparent = parent->_parent;
 			if (!grandparent) return;
 			balance = grandparent->get_balance();
 			//std::cout << "balance" << balance << "\n";
@@ -230,6 +270,20 @@ class Avltree {
 				}
 			}
 		}
+};
+
+/*
+template < class Key, class Value, class Compare>
+bool compare_key(pair<Key, Value> p1, pair<Key, Value> p2) {
+	return Compare(p1.first, p2.first);
+}
+*/
+
+template <class Key, class Value, class Compare>
+struct compare_key {
+	bool operator() (pair<Key, Value> p1, pair<Key, Value> p2) {
+		return Compare()(p1.first, p2.first);
+	}
 };
 
 template < class Key,
@@ -256,7 +310,7 @@ class map {
 	//TODO reverse_itarator
 	//TODO const_reverse_iterator
 	private:
-	Avltree<value_type> _tree;
+	Avltree<value_type, compare_key<Key, T, Compare> > _tree;
 	key_compare _comp;
 	allocator_type _alloc;
 	public:
@@ -271,15 +325,23 @@ class map {
  //map& operator= (const map& x);
 	iterator begin() {return _tree.begin();};
 	const_iterator begin() const {return _tree.begin();};
-
+	iterator end() {return _tree.end();};
+	const_iterator end() const {return _tree.end();};
+	bool empty() {return !_tree._root;}
+	size_type size() {
+		if (empty()) return 0;
+		return _tree._root->size();
+	}
 	//Modifiers
 	pair<iterator,bool> insert (const value_type& val) {
-		iterator already_exists = _tree.find(val);
-		if (already_exists) {
-			pair<iterator, bool> retval(already_exists, false);
-			return retval;
+		if (!empty()) {
+			iterator already_exists = _tree.find(val);
+			if (already_exists != end()) {
+				pair<iterator, bool> retval(already_exists, false);
+				return retval;
+			}
 		}
-		pair<iterator, bool> retval(already_exists, false);
+		pair<iterator, bool> retval(_tree.insert(val), true);
 		return retval;
 	}
 
