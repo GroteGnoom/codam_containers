@@ -377,6 +377,7 @@ class Avltree {
    }
    */
 
+//TODO should inherit from binary_function? Or maybe it doesn't matter because it's only used internally?
 template <class Key, class Value, class Compare>
 struct compare_key {
 	bool operator() (pair<Key, Value> p1, pair<Key, Value> p2) {
@@ -395,7 +396,21 @@ class map {
 	 typedef T mapped_type;
 	 typedef pair<const key_type, mapped_type> value_type;
 	 typedef Compare key_compare;
-	 class value_compare {}; //TODO
+	 class value_compare : std::binary_function<value_type, value_type, bool> {
+		 protected:
+			 Compare comp;
+			 value_compare (Compare c) : comp(c) {}
+		 public:
+			 typedef bool result_type;
+			 typedef value_type first_argument_type;
+			 typedef value_type second_argument_type;
+			 bool operator() (const value_type& x, const value_type& y) const
+			 {
+				 return comp(x.first, y.first);
+				 /*this was my old way of doing things:*/
+				 //return Compare()(x.first, y.first);
+			 }
+	 };
 	 typedef Alloc allocator_type;
 	 typedef typename allocator_type::reference reference;
 	 typedef typename allocator_type::const_reference const_reference;
@@ -466,6 +481,21 @@ class map {
 	 }
 	 //void erase (iterator first, iterator last); //TODO
 
+	 void swap (map& x) {
+		 Avlnode<value_type, compare_key<key_type, mapped_type, Compare> > *s = _tree._root;
+		 _tree._root = x._tree._root;
+		 x._tree._root = s;
+	 }
+	//https://stackoverflow.com/questions/14187006/is-calling-destructor-manually-always-a-sign-of-bad-design
+	 void clear() {
+		 _tree.~Avltree<value_type, compare_key<Key, T, Compare> >();
+	 }
+	 key_compare key_comp() const {
+		 return _comp;
+	 };
+	 value_compare value_comp() const {
+		 return value_compare();
+	 }
 }; //map
 } //namespace
 #endif

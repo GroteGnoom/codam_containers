@@ -545,6 +545,28 @@ void test_map() {
 		std::cout << "What is its size?" << m.size() << "\n";
 		it = m.find("hoi");
 		std::cout << "is find equal to end? " << (it == m.end()) << "\n";
+
+
+		map<std::string, int> m2;
+
+		m2["asdfa"] = 12;
+		std::cout << "What is the size of a new tree" << m.size() << "\n";
+		m.swap(m2);
+		std::cout << "What is the size old tree after swap" << m.size() << "\n";
+		std::cout << "What is the size the new tree after swap" << m2.size() << "\n";
+		m.clear();
+		std::cout << "What is the size old tree after clear" << m.size() << "\n";
+
+		map<std::string, int>::key_compare kc = m.key_comp();
+		std::cout << "compare a and b:" << kc("a", "b") << "\n";
+
+
+
+		map<std::string, int>::value_compare vc = m.value_comp();
+
+		map<std::string, int>::value_type v1;
+		map<std::string, int>::value_type v2;
+		std::cout << "compare with value type:" << vc(v1, v2) << "\n";
 	}
 }
 
