@@ -491,13 +491,47 @@ void test_map() {
 		map<std::string, int> m;
 		std::cout << "Is empty map empty? " << m.empty() << "\n";
 		std::cout << "What is its size?" << m.size() << "\n";
-		m.insert(pair<std::string, int>("hoi", 5));
+		pair<map<std::string, int>::iterator, bool> a = m.insert(pair<std::string, int>("hoi", 5));
 		std::cout << "Is non-empty map empty? " << m.empty() << "\n";
+		std::cout << "What is its size?" << m.size() << "\n";
+		std::cout << "What the dereferenced iterator key? " << (*(a.first)).first << "\n";
+		std::cout << "What the dereferenced iterator key via ->? " << a.first->first << "\n";
+		std::cout << "What the dereferenced iterator value? " << (*(a.first)).second << "\n";
+		std::cout << "What the dereferenced iterator value via ->? " << a.first->second << "\n";
+		a = m.insert(pair<std::string, int>("hoi", 10));
+		std::cout << "Try to add the same key, should do nothing, so same key has same value: " << a.first->second << "\n";
+		//std::cout << "What is the max size?" << m.max_size() << "\n"; //TODO check by hand? They don't have to be the same. Maybe nodes will be bigger with more state to make things quicker
+		a = m.insert(pair<std::string, int>("banaan", 20));
+		std::cout << "Try to add different key: " << a.first->second << "\n";
+
+		//Element access
+		m["aa"] = 10;
+		std::cout << "add aa = 10, aa is" << m["aa"];
+		//std::cout << "bb is " << m["bb"]; //TODO leaks
+
+		//modifiers
+		//
+		//insert is already tested
+		map<std::string, int>::iterator it;
+		it = m.find("hoi");
+		std::cout << "is find equal to end? " << (it == m.end()) << "\n";
+		std::cout << "erase element\n";
+		m.erase("hoi");
+		it = m.find("hoi");
+		std::cout << "is find equal to end? " << (it == m.end()) << "\n";
 	}
+}
+
+void test_pair() {
+	pair<std::string, int> p1;
+	pair<std::string, int> p2;
+	p1 = p2;
+	//TODO everything else
 }
 
 
 int main() {
+	test_pair();
 	test_vector();
 	test_map();
 }

@@ -15,5 +15,17 @@ do TODOs
 remove all new's that should be allocs
 
 up next:
-	max_size, the whole list
+	erase, implement the node part
+		- implement rebalance
+		- i think I just need a copy constructor for avlnodes, the error output is very confusing now, probably because of the implicit copy assignment?
+		somewhere te string turns to const. Why?
+		class Alloc = std::allocator<pair<const Key,T> > >
+		so.... I can't replace keys?
+		so in erase, I need to 
+		- working on the end of erase, about line 270, to make sure the this is replaced by the next
+
+		the allocator thinks the string is const?
+	all the other functions
 	avl tree should use the map allocator
+
+check all nodes for rebalancing? or only parts where there has been an insertion or deletion?

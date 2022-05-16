@@ -70,5 +70,11 @@ int main() {
 	a.insert(13);
 
 	print_avl(a._root, 0);
+	//std::cout << "Erase root:\n";
+	//a._root->erase();
+	//print_avl(a._root, 0);
+	std::cout << "Erase 12:\n";
+	reinterpret_cast<Avlnode<int>*>(a.find(12))->erase();
+	print_avl(a._root, 0);
 }
 
