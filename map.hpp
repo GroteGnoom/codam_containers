@@ -247,11 +247,17 @@ struct Avlnode {
 			else if (parent->_right == this)
 				parent->_right = NULL;
 			delete this;
-		} else if (!_left || !_right) {
+		} else if (!_left) {
 			if (parent->_left == this)
 				parent->_left = _right;
 			else if (parent->_right == this)
 				parent->_right = _right;
+			delete this;
+		} else if (!_right) {
+			if (parent->_left == this)
+				parent->_left = _left;
+			else if (parent->_right == this)
+				parent->_right = _left;
 			delete this;
 		} else {
 			Avlnode *next = _right;
@@ -334,6 +340,9 @@ class Avltree {
 				return found;
 			return end();
 		}
+		void reroot() { //TODO private
+			_root = _root->root();
+		}
 	private:
 		void rebalance(Avlnode<T, Compare> *new_node) {
 			int balance;
@@ -398,8 +407,8 @@ class map {
 	 typedef const bi_iterator<value_type, size_type> const_iterator;
 	 //TODO reverse_itarator
 	 //TODO const_reverse_iterator
+	 Avltree<value_type, compare_key<Key, T, Compare> > _tree; //TODO private, public for debugging
 	 private:
-	 Avltree<value_type, compare_key<Key, T, Compare> > _tree;
 	 key_compare _comp;
 	 allocator_type _alloc;
 	 public:
@@ -431,6 +440,7 @@ class map {
 				 return retval;
 			 }
 		 }
+		 //std::cout << "it was empty or it didn't exist\n";
 		 pair<iterator, bool> retval(_tree.insert(val), true);
 		 return retval;
 	 }
@@ -441,6 +451,7 @@ class map {
 	 void erase (iterator position) {
 		 Avlnode<value_type> *p = reinterpret_cast<Avlnode<value_type> *>(&(*position));
 		 p->erase();
+		 _tree.reroot();
 	 }
 	 iterator find (const key_type& k) {
 		 return _tree.find(pair<key_type, mapped_type>(k,mapped_type()));

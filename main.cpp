@@ -5,10 +5,26 @@
 #	include <iterator>
 #	include <typeinfo>
 #	include <map>
+template <typename T>
+void print_avl(void *a , int spaces ) {
+	(void) a;
+	(void) spaces;
+}
 #else
 #	include "vector.hpp"
 #	include "map.hpp"
 	using namespace ft;
+template <typename T, class Compare>
+void print_avl(ft::Avlnode<T, Compare> *a , int spaces ) {
+	if (!a) return;
+	print_avl(a->_right, spaces + 5 );
+	for (int i = 1; i <= spaces; ++i ) {
+		std::cout << " ";
+	}
+	std::cout << a->_elem << "," << a->get_height() << "," << a->get_balance() << "\n";
+	print_avl( a->_left, spaces + 5 );
+}
+
 #endif
 
 #include <iostream>
@@ -506,9 +522,18 @@ void test_map() {
 
 		//Element access
 		m["aa"] = 10;
-		std::cout << "add aa = 10, aa is" << m["aa"];
-		//std::cout << "bb is " << m["bb"]; //TODO leaks
+		std::cout << "add aa = 10, aa is " << m["aa"] << "\n";
+		m["a"] = 20;
+		std::cout << "add a = 20, a is " << m["a"] << "\n";
+		std::cout << "aa a is " << m["aa"] << "\n";
+		std::cout << "bb is " << m["bb"] << "\n"; //TODO leaks
+		std::cout << "bb is " << m["bb"] << "\n"; //TODO leaks
+		std::cout << "bb is " << m["bb"] << "\n"; //TODO leaks
 
+		std::cout << "What is its size? " << m.size() << "\n";
+		m.erase("a");
+		std::cout << "after erasing a is " << m["a"] << "\n";
+		std::cout << "What is its size? " << m.size() << "\n";
 		//modifiers
 		//
 		//insert is already tested
@@ -517,6 +542,7 @@ void test_map() {
 		std::cout << "is find equal to end? " << (it == m.end()) << "\n";
 		std::cout << "erase element\n";
 		m.erase("hoi");
+		std::cout << "What is its size?" << m.size() << "\n";
 		it = m.find("hoi");
 		std::cout << "is find equal to end? " << (it == m.end()) << "\n";
 	}
