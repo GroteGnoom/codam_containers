@@ -29,3 +29,6 @@ up next:
 	avl tree should use the map allocator
 
 check all nodes for rebalancing? or only parts where there has been an insertion or deletion?
+
+
+check if there's some way to replace compare_key with value_compare

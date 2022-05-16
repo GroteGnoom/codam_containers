@@ -397,6 +397,7 @@ class map {
 	 typedef pair<const key_type, mapped_type> value_type;
 	 typedef Compare key_compare;
 	 class value_compare : std::binary_function<value_type, value_type, bool> {
+		 friend class map;
 		 protected:
 			 Compare comp;
 			 value_compare (Compare c) : comp(c) {}
@@ -494,7 +495,7 @@ class map {
 		 return _comp;
 	 };
 	 value_compare value_comp() const {
-		 return value_compare();
+		 return value_compare(key_comp());
 	 }
 }; //map
 } //namespace

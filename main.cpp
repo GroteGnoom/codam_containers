@@ -560,8 +560,6 @@ void test_map() {
 		map<std::string, int>::key_compare kc = m.key_comp();
 		std::cout << "compare a and b:" << kc("a", "b") << "\n";
 
-
-
 		map<std::string, int>::value_compare vc = m.value_comp();
 
 		map<std::string, int>::value_type v1;
