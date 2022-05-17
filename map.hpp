@@ -16,7 +16,7 @@ class bi_iterator : public general_iterator<bidirectional_iterator_tag, T, Dista
 	private:
 	typename base::pointer _pointer;
 	public:
-	bi_iterator(typename base::pointer p) : _pointer(p) {}
+	bi_iterator(const typename base::pointer p) : _pointer(p) {}
 	bi_iterator() : _pointer(NULL) {}
 	bool operator == (const bi_iterator &bii) const { return _pointer == bii._pointer; }
 	bool operator != (const bi_iterator &bii) const { return _pointer != bii._pointer; }
@@ -107,11 +107,19 @@ struct Avlnode {
 		return lheight - rheight;
 	}
 	Avlnode *root() {
-		Avlnode *a = this;;
+		Avlnode *a = this;
 		while (a->_parent)
 			a = a->_parent;
 		return a;
 	}
+	/*
+	const Avlnode *root() const {
+		const Avlnode *a = this;
+		while (a->_parent)
+			a = a->_parent;
+		return a;
+	}
+	*/
 	void left_rotate() {
 		Avlnode *x = this;
 		Avlnode *y = _right;
@@ -197,7 +205,7 @@ struct Avlnode {
 			_right = NULL;
 		}
 	}
-	T* find(T a) {
+	T* find(const T a) {
 		if (Compare()(a, _elem)){
 			if (!_left)
 				return NULL;
@@ -210,7 +218,20 @@ struct Avlnode {
 			return &_elem;
 		}
 	}
-	size_t size() {
+	const T* find(const T a) const {
+		if (Compare()(a, _elem)){
+			if (!_left)
+				return NULL;
+			return _left->find(a);
+		} else if (Compare()(_elem, a)){
+			if (!_right)
+				return NULL;
+			return _right->find(a);
+		} else {
+			return &_elem;
+		}
+	}
+	size_t size() const {
 		size_t lsize = 0;
 		size_t rsize = 0;
 		if (_left)
@@ -289,6 +310,11 @@ struct Avlnode {
 		}
 		start_balance->after_erase_balance();
 	}
+	/*
+	T* lower_bound(T a) {
+		return const_cast<T *>(const_cast <const Avlnode <T, Compare, Alloc> &> (*this).lower_bound(a));
+	}
+	*/
 };
 
 template <class T, class Compare = std::less<T>, class Alloc = std::allocator<T> >
@@ -314,7 +340,7 @@ class Avltree {
 			delete _root;
 			_root = NULL;
 		}
-		T* begin() {
+		T* begin() const {
 			if (!_root) return NULL;
 			Avlnode<T, Compare> *search = _root;
 
@@ -323,7 +349,7 @@ class Avltree {
 			}
 			return &(search->_elem);
 		}
-		T* end() {
+		T* end() const {
 			if (!_root) return begin();
 			Avlnode<T, Compare> *search = _root;
 
@@ -332,7 +358,7 @@ class Avltree {
 			}
 			return &(search->_elem) + 1;
 		}
-		T* find(T a) {
+		T* find(const T a) {
 			if (!_root)
 				return end();
 			T* found = _root->find(a);
@@ -340,8 +366,87 @@ class Avltree {
 				return found;
 			return end();
 		}
-		void reroot() { //TODO private
+		const T* find(const T a) const {
+			if (!_root)
+				return end();
+			T* found = _root->find(a);
+			if (found)
+				return found;
+			return end();
+		}
+		void reroot() {
 			_root = _root->root();
+		}
+		const T* lower_bound(const T a) const {
+			//std::cout << "start of lower bound\n";
+			if (!_root) return end();
+			//std::cout << "there's a root\n";
+			const Avlnode<T, Compare, Alloc> *current = _root;
+			//std::cout << "current elem before loop: " << current->_elem.first << "\n";
+			while (Compare()(current->_elem, a)) {
+				//std::cout << "current elem:" << current->_elem << "\n";
+				if (!current->_right)
+					return end();
+				current = current->_right;
+			}
+			//std::cout << "found upper bound: " << current->_elem << "\n";
+			const Avlnode<T, Compare, Alloc> *found = current;
+			while (true) {
+				if (Compare()(a, current->_elem))
+				{
+					if (current->_left)
+						current = current->_left;
+					else
+						break;
+				}
+				else if (Compare()(current->_elem, a))  {
+					if (current->_right)
+						current = current->_right;
+					else break;
+				}
+				else
+					return &(current->_elem);
+				if (Compare()(current->_elem, found->_elem)
+				&& Compare()(a, current->_elem))
+					found = current;
+			}
+			return &(found->_elem);
+		}
+		T* lower_bound(const T a) {
+			return const_cast<T *>(const_cast <const Avltree <T, Compare, Alloc> &> (*this).lower_bound(a));
+		}
+		/* not the reverse of upper bound, this needs to be strictly after a */
+		/* can also only use this function, and make lower bound a combination of upper_bound and find */
+		const T* upper_bound(const T a) const {
+			if (!_root) return end();
+			const Avlnode<T, Compare, Alloc> *current = _root;
+			while (!Compare()(a, current->_elem)) {
+				if (!current->_right)
+					return end();
+				current = current->_right;
+			}
+			const Avlnode<T, Compare, Alloc> *found = current;
+			while (true) {
+				if (Compare()(a, current->_elem))
+				{
+					if (current->_left)
+						current = current->_left;
+					else
+						break;
+				}
+				else {
+					if (current->_right)
+						current = current->_right;
+					else break;
+				}
+				if (Compare()(current->_elem, found->_elem)
+				&& Compare()(a, current->_elem))
+					found = current;
+			}
+			return &(found->_elem);
+		}
+		T* upper_bound(const T a) {
+			return const_cast<T *>(const_cast <const Avltree <T, Compare, Alloc> &> (*this).upper_bound(a));
 		}
 	private:
 		void rebalance(Avlnode<T, Compare> *new_node) {
@@ -419,8 +524,10 @@ class map {
 	 typedef typename allocator_type::const_pointer const_pointer;
 	 typedef std::ptrdiff_t difference_type;
 	 typedef size_t size_type;
-	 typedef bi_iterator<value_type, size_type> iterator;
-	 typedef const bi_iterator<value_type, size_type> const_iterator;
+	 //typedef std::bi_iterator<value_type, size_type> iterator;
+	 //typedef const bi_iterator<value_type, size_type> const_iterator;
+	 typedef value_type * iterator; //TODO should not be just a pointer?
+	 typedef const iterator const_iterator; //TODO
 	 //TODO reverse_itarator
 	 //TODO const_reverse_iterator
 	 Avltree<value_type, compare_key<Key, T, Compare> > _tree; //TODO private, public for debugging
@@ -435,7 +542,10 @@ class map {
 	 //	map (InputIterator first, InputIterator last,
 	 //			const key_compare& comp = key_compare(),
 	 //			const allocator_type& alloc = allocator_type());	
-	 // TODO map (const map& x);
+	 map (const map& x) { //TODO
+		 (void) x;
+		 throw std::logic_error("Function not yet implemented");
+	 }
 	 //map& operator= (const map& x);
 	 iterator begin() {return _tree.begin();};
 	 const_iterator begin() const {return _tree.begin();};
@@ -472,6 +582,12 @@ class map {
 	 iterator find (const key_type& k) {
 		 return _tree.find(pair<key_type, mapped_type>(k,mapped_type()));
 	 }
+	 const_iterator find (const key_type& k) const {
+		 const pair<key_type, mapped_type> p(k,mapped_type());
+		 return const_iterator(_tree.find(p));
+		 //const Avlnode<value_type> *r = reinterpret_cast<const Avlnode<value_type> *>(_tree.find(p));
+		 //return r;
+	 }
 
 	 size_type erase (const key_type& k) {
 		 iterator i = find(k);
@@ -497,6 +613,20 @@ class map {
 	 value_compare value_comp() const {
 		 return value_compare(key_comp());
 	 }
+	 size_type count (const key_type& k) const {
+		const_iterator i = find(k);
+		if (i == end())
+		 return 0;
+		return 1;
+	 };
+	 iterator lower_bound (const key_type& k) {
+		return _tree.lower_bound(value_type(k, mapped_type()));
+	 }
+	 //const_iterator lower_bound (const key_type& k) const; //TODO
+	 iterator upper_bound (const key_type& k) {
+		return _tree.upper_bound(value_type(k, mapped_type()));
+	 }
+	 //const_iterator upper_bound (const key_type& k) const; //TODO
 }; //map
 } //namespace
 #endif

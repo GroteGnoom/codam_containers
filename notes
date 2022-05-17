@@ -21,3 +21,9 @@ For pointers you have to handle iterator traits separately, and you can check if
 https://www.programiz.com/dsa/avl-tree
 
 My avltree is general, it takes <T>, but that doesn't work. Because sometimes it needs to find a key. That doesn't make sense if it doesn't know it has pairs? Or I could make a function that only works for pairs. Or I could passin the compare?
+
+
+I still need to be better at this:
+https://stackoverflow.com/questions/8788863/can-const-member-function-return-a-non-const-pointer-to-a-data-member
+
+again encountered the problem where I call a function with a map, the function copies the map, the map copy constructor is not yet implemented, so it doesn't deep copy, the destructor does work, so the map gets removed, and then then I get use after free.

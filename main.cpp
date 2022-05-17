@@ -483,6 +483,15 @@ void test_vector() {
 	check_enable_if();
 }
 
+template <class Key, class T>
+Key it_to_key(typename map<Key, T>::iterator it, map<Key, T> &m) {
+	if (it == m.end()) {
+		std::cout << "iterator at end!\n";
+		return Key();
+	}
+	return it->first;
+}
+
 void test_map() {
 #define check_type(a) do {(void)sizeof(map<std::string, int>::a);} while (0)
 	check_type(key_type);
@@ -565,6 +574,18 @@ void test_map() {
 		map<std::string, int>::value_type v1;
 		map<std::string, int>::value_type v2;
 		std::cout << "compare with value type:" << vc(v1, v2) << "\n";
+
+
+		std::cout << "count aa: " << m2.count("aa") << "\n";
+		std::cout << "count cc: " << m2.count("cc") << "\n";
+
+		std::cout << "lower bound a: " << it_to_key(m2.lower_bound("a"), m2) << "\n";
+		std::cout << "lower bound b: " << it_to_key(m2.lower_bound("b"), m2) << "\n";
+		std::cout << "lower bound c: " << it_to_key(m2.lower_bound("c"), m2) << "\n";
+
+		std::cout << "upper bound a: " << it_to_key(m2.upper_bound("a"), m2) << "\n";
+		std::cout << "upper bound b: " << it_to_key(m2.upper_bound("b"), m2) << "\n";
+		std::cout << "upper bound c: " << it_to_key(m2.upper_bound("c"), m2) << "\n";
 	}
 }
 
