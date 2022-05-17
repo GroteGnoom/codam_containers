@@ -527,7 +527,7 @@ class map {
 	 //typedef std::bi_iterator<value_type, size_type> iterator;
 	 //typedef const bi_iterator<value_type, size_type> const_iterator;
 	 typedef value_type * iterator; //TODO should not be just a pointer?
-	 typedef const iterator const_iterator; //TODO
+	 typedef const value_type * const_iterator; //TODO
 	 //TODO reverse_itarator
 	 //TODO const_reverse_iterator
 	 Avltree<value_type, compare_key<Key, T, Compare> > _tree; //TODO private, public for debugging
@@ -619,12 +619,28 @@ class map {
 		 return 0;
 		return 1;
 	 };
+	 const_iterator lower_bound (const key_type& k) const {
+		return _tree.lower_bound(value_type(k, mapped_type()));
+	 }
 	 iterator lower_bound (const key_type& k) {
 		return _tree.lower_bound(value_type(k, mapped_type()));
 	 }
-	 //const_iterator lower_bound (const key_type& k) const; //TODO
+	 const_iterator upper_bound (const key_type& k) const {
+		return _tree.upper_bound(value_type(k, mapped_type()));
+	 }
 	 iterator upper_bound (const key_type& k) {
 		return _tree.upper_bound(value_type(k, mapped_type()));
+	 }
+	 pair<const_iterator,const_iterator> equal_range (const key_type& k) const {
+		 const_iterator i = find(k);
+		 if (i != end()) {
+			 return pair<const_iterator,const_iterator>(i, upper_bound(k));
+		 }
+		 return pair<const_iterator,const_iterator>(upper_bound(k), upper_bound(k));
+	 }
+	 pair<iterator,iterator> equal_range (const key_type& k) {
+		pair<const_iterator,const_iterator> p = const_cast<const map<Key, T, Compare, Alloc> &>(*this).equal_range(k);
+		return pair<iterator, iterator>(const_cast<iterator> (p.first), const_cast<iterator> (p.second));
 	 }
 	 //const_iterator upper_bound (const key_type& k) const; //TODO
 }; //map

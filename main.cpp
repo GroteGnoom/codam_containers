@@ -586,6 +586,10 @@ void test_map() {
 		std::cout << "upper bound a: " << it_to_key(m2.upper_bound("a"), m2) << "\n";
 		std::cout << "upper bound b: " << it_to_key(m2.upper_bound("b"), m2) << "\n";
 		std::cout << "upper bound c: " << it_to_key(m2.upper_bound("c"), m2) << "\n";
+		
+		std::cout << "range a: " << it_to_key(m2.equal_range("a").first, m2) << " " << it_to_key(m2.equal_range("a").second, m2) << "\n";
+		std::cout << "range b: " << it_to_key(m2.equal_range("b").first, m2) << " " << it_to_key(m2.equal_range("b").second, m2) << "\n";
+		std::cout << "range c: " << it_to_key(m2.equal_range("c").first, m2) << " " << it_to_key(m2.equal_range("c").second, m2) << "\n";
 	}
 }
 
