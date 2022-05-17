@@ -642,7 +642,7 @@ class map {
 		pair<const_iterator,const_iterator> p = const_cast<const map<Key, T, Compare, Alloc> &>(*this).equal_range(k);
 		return pair<iterator, iterator>(const_cast<iterator> (p.first), const_cast<iterator> (p.second));
 	 }
-	 //const_iterator upper_bound (const key_type& k) const; //TODO
+	 allocator_type get_allocator() const {return _alloc;};
 }; //map
 } //namespace
 #endif
