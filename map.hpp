@@ -105,14 +105,15 @@ struct Avlnode {
 	Avlnode *_parent;
 	Avlnode(T elem, Avlnode<T, Compare, Alloc> *parent) : _elem(elem), _left(NULL), _right(NULL), _parent(parent) {}
 	Compare comp;
-	Avlnode(const Avlnode &a) {
-		*this = a;
+	std::allocator<Avlnode> node_alloc;
+	Avlnode(const Avlnode &a) : _elem(a._elem), _left(a._left), _right(a._right), _parent(a._parent), comp(a.comp)  {
 	}
 	Avlnode &operator=(const Avlnode &a) {
 		_elem = a._elem;
 		_left = a._left;
 		_right = a._right;
 		_parent = a._parent;
+		comp = a.comp;
 		return *this;
 	}
 	int get_height() const {
@@ -202,33 +203,49 @@ struct Avlnode {
 			}
 		}
 	}
+	template <class Nalloc>
+	static Avlnode *newroot(T elem ) {
+		Nalloc nalloc;
+		Avlnode *node = nalloc.allocate(1);
+		nalloc.construct(node, Avlnode(elem, NULL));
+		return node;
+	}
+	Avlnode *newnode(T elem) {
+		Avlnode *node = node_alloc.allocate(1);
+		node_alloc.construct(node, Avlnode(elem, this));
+		return node;
+	}
 	Avlnode *insert(T elem) {
 		if (Compare()(elem, _elem)) {
 			if (_left) {
 				return _left->insert(elem);
 			}
 			else {
-				_left = new Avlnode(elem, this);
+				_left = this->newnode(elem);
 				return _left;
 			}
 		} else {
 			if (_right)
 				return _right->insert(elem);
 			else {
-				_right = new Avlnode(elem, this);
+				_right = this->newnode(elem);
 				return _right;
 			}
 		}
 	}
+	void del() {
+			this->~Avlnode();
+			node_alloc.deallocate(this, 1);
+	}
 	void del_children() {
 		if (_left) {
 			_left->del_children();
-			delete _left;
+			_left->del();
 			_left = NULL;
 		}
 		if (_right) {
 			_right->del_children();
-			delete _right;
+			_right->del();
 			_right = NULL;
 		}
 	}
@@ -292,19 +309,19 @@ struct Avlnode {
 				parent->_left = NULL;
 			else if (parent->_right == this)
 				parent->_right = NULL;
-			delete this;
+			this->del();
 		} else if (!_left) {
 			if (parent->_left == this)
 				parent->_left = _right;
 			else if (parent->_right == this)
 				parent->_right = _right;
-			delete this;
+			this->del();
 		} else if (!_right) {
 			if (parent->_left == this)
 				parent->_left = _left;
 			else if (parent->_right == this)
 				parent->_right = _left;
-			delete this;
+			this->del();
 		} else {
 			Avlnode *next = _right;
 			int steps = 0;
@@ -327,7 +344,7 @@ struct Avlnode {
 			}
 			next->_left = _left;
 			next->_right = _right;
-			delete (this);
+			this->del();
 			//std::cout << "parent right" << parent->_right->_elem << "\n";
 			//std::cout << "parent right right" << parent->_right->_right->_elem << "\n";
 			//std::cout << "parent right left" << parent->_right->_left->_elem << "\n";
@@ -354,7 +371,7 @@ class Avltree {
 		Avltree() : _root(NULL) {}
 		node* insert(T elem) {
 			if (!_root) {
-				_root = new node(elem, NULL);
+				_root = node::template newroot<std::allocator<node> >(elem);
 				return _root;
 			} else {
 				node *new_node = _root->insert(elem);
@@ -367,7 +384,7 @@ class Avltree {
 		~Avltree() {
 			if (!_root) return;
 			_root->del_children();
-			delete _root;
+			_root->del();
 			_root = NULL;
 		}
 		node *begin() const {
@@ -523,6 +540,7 @@ struct compare_key {
 template < class Key,
  class T,
  class Compare = std::less<Key>,
+// class Alloc = std::allocator<pair<const Key,T> > >
  class Alloc = std::allocator<pair<const Key,T> > >
 
 class map {

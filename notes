@@ -27,3 +27,11 @@ I still need to be better at this:
 https://stackoverflow.com/questions/8788863/can-const-member-function-return-a-non-const-pointer-to-a-data-member
 
 again encountered the problem where I call a function with a map, the function copies the map, the map copy constructor is not yet implemented, so it doesn't deep copy, the destructor does work, so the map gets removed, and then then I get use after free.
+
+
+why is this ok?
+-------node*	find(const value_type& val) const
+why doesn't the node* have to point to something const
+because you can't actually change the members of the tree, because that only has a root pointer, and the value of that pointer will not be changed
+and then the outside world will not notice a problem because te map itself converts it to a const_iterator
+only use iterators at the map level, the rest just uses pointers

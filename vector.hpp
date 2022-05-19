@@ -112,7 +112,6 @@ class vector {
 	//typedef reverse_iterator //TODO
 	typedef ptrdiff_t difference_type; //TODO is it always ptrdiff?
 	//typedef reverse_ra_iterator<T, size_type> reverse_iterator;
-	//
 	private:
 	allocator_type _alloc;
 	size_type _size;

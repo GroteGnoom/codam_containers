@@ -10,25 +10,21 @@ checking NULL from allocator?
 know what explicit means
 
 
+todo forever:
 remove assertions
 do TODOs
-remove all new's that should be allocs
+no new or delete where there should be an alloc;
 
 up next:
 //NOW for the line I'm working on
-	mayeb I should just move find to the tree, instread of having it at the node, because that could give me more const problems? Like I can change the node in a const tree, but not a node in a const node.
-	fix map iterator, things go immediately wrong when looping over them now
-	why is this ok?
-	-------node*	find(const value_type& val) const
-	why doesn't the node* have to point to something const
-		because you can't actually change the members of the tree, because that only has a root pointer, and the value of that pointer will not be changed
-	and then the outside world will not notice a problem because te map itself converts it to a const_iterator
-	only use iterators at the map level, the rest just uses pointers
+	rebind the allocator to get the node allocator
 	avl tree should use the map allocator
 	for vector operator = you should preserve the allocator
+	lots of things private?
 
 check all nodes for rebalancing? or only parts where there has been an insertion or deletion?
 
 
+done:
 check if there's some way to replace compare_key with value_compare
-
+fix map iterator, things go immediately wrong when looping over them now
