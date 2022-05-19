@@ -14,8 +14,8 @@ void print_avl(void *a , int spaces ) {
 #	include "vector.hpp"
 #	include "map.hpp"
 	using namespace ft;
-template <typename T, class Compare>
-void print_avl(ft::Avlnode<T, Compare> *a , int spaces ) {
+template <typename T, class Compare, class Alloc>
+void print_avl(ft::Avlnode<T, Compare, Alloc> *a , int spaces ) {
 	if (!a) return;
 	print_avl(a->_right, spaces + 5 );
 	for (int i = 1; i <= spaces; ++i ) {
@@ -492,6 +492,12 @@ Key it_to_key(typename map<Key, T>::iterator it, map<Key, T> &m) {
 	return it->first;
 }
 
+
+void print_elems(map<std::string, int> &m) {
+	for (map<std::string, int>::iterator first = m.begin(); first != m.end(); first++) {
+		std::cout << first->first << " " << first->second << "\n";
+	}
+}
 void test_map() {
 #define check_type(a) do {(void)sizeof(map<std::string, int>::a);} while (0)
 	check_type(key_type);
@@ -512,8 +518,20 @@ void test_map() {
 	check_type(size_type);
 #undef check_type
 	{
-		std::cout << "Capacity\n";
+		std::cout << "Constructors:\n";
 		map<std::string, int> m;
+		m["a"] = 100;
+		m["b"] = 11;
+		map<std::string, int> m2 = m;
+		m2["d"] = 4;
+		m2["c"] = 5;
+		print_elems(m);
+		print_elems(m2);
+	}
+	{
+		map<std::string, int> m;
+
+		std::cout << "Capacity\n";
 		std::cout << "Is empty map empty? " << m.empty() << "\n";
 		std::cout << "What is its size?" << m.size() << "\n";
 		pair<map<std::string, int>::iterator, bool> a = m.insert(pair<std::string, int>("hoi", 5));
