@@ -105,7 +105,7 @@ struct Avlnode {
 	Avlnode *_parent;
 	Avlnode(T elem, Avlnode<T, Compare, Alloc> *parent) : _elem(elem), _left(NULL), _right(NULL), _parent(parent) {}
 	Compare comp;
-	std::allocator<Avlnode> node_alloc;
+	typename Alloc::template rebind<Avlnode>::other node_alloc;
 	Avlnode(const Avlnode &a) : _elem(a._elem), _left(a._left), _right(a._right), _parent(a._parent), comp(a.comp)  {
 	}
 	Avlnode &operator=(const Avlnode &a) {
@@ -202,13 +202,6 @@ struct Avlnode {
 				parent->_right = x;
 			}
 		}
-	}
-	template <class Nalloc>
-	static Avlnode *newroot(T elem ) {
-		Nalloc nalloc;
-		Avlnode *node = nalloc.allocate(1);
-		nalloc.construct(node, Avlnode(elem, NULL));
-		return node;
 	}
 	Avlnode *newnode(T elem) {
 		Avlnode *node = node_alloc.allocate(1);
@@ -365,13 +358,20 @@ class Avltree {
 	//typedef node_iterator<const T, Compare, Alloc> const_iterator;
 	typedef Avlnode<T, Compare, Alloc> node;
 	typedef Avlnode<const T, Compare, Alloc> const_node;
+	typename Alloc::template rebind<node>::other node_alloc;
 	public:
+		node *newroot(T elem ) {
+			node *np = node_alloc.allocate(1);
+			node n(elem, NULL);
+			node_alloc.construct(np, n);
+			return np;
+		}
 		Compare comp;
 		Avlnode<T, Compare, Alloc> *_root;
 		Avltree() : _root(NULL) {}
 		node* insert(T elem) {
 			if (!_root) {
-				_root = node::template newroot<std::allocator<node> >(elem);
+				_root = newroot(elem);
 				return _root;
 			} else {
 				node *new_node = _root->insert(elem);
