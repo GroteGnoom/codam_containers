@@ -35,8 +35,8 @@ test:
 	$(MAKE) re DEBUG=1
 	./containers > output
 	diff -a std_output output
-	$(MAKE) re DEBUG=1 SRC=test_avl.cpp NAME=test_avl
-	./test_avl
+	#$(MAKE) re DEBUG=1 SRC=test_avl.cpp NAME=test_avl
+	#./test_avl
 
 clean:
 	rm -f $(OBJ)

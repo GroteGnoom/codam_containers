@@ -519,9 +519,11 @@ void test_map() {
 #undef check_type
 	{
 		std::cout << "Constructors:\n";
+		std::cout << "default constructor:\n";
 		map<std::string, int> m;
 		m["a"] = 100;
 		m["b"] = 11;
+		std::cout << "copy constructor:\n";
 		map<std::string, int> m2 = m;
 		m2["d"] = 4;
 		m2["c"] = 5;

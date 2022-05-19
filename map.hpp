@@ -18,8 +18,10 @@ class node_iterator : public general_iterator<bidirectional_iterator_tag, Avlnod
 	private:
 	typename base::pointer _pointer;
 	public:
-	node_iterator(typename base::pointer p) : _pointer(p) {}
-	node_iterator() : _pointer(NULL) {}
+	node_iterator(typename base::pointer p) : _pointer(p) {
+	}
+	node_iterator() : _pointer(NULL) {
+	}
 	bool operator == (const node_iterator &nodei) const { return _pointer == nodei._pointer; }
 	bool operator != (const node_iterator &nodei) const { return _pointer != nodei._pointer; }
 	//TODO operations
@@ -40,6 +42,7 @@ class node_iterator : public general_iterator<bidirectional_iterator_tag, Avlnod
 	/*implicit conversion!*/
 	operator node_iterator< T, Compare, Alloc, const T*, const T&> () const
 	{
+		//std::cout << "implcit node iterator conversion\n";
 		//node_iterator n = node_iterator<T, Compare, Alloc>(_pointer);
 		//node_iterator n2 = node_iterator<const T, Compare, Alloc>(_pointer);
 		return (node_iterator< T, Compare, Alloc, const T*, const T&>(_pointer));
@@ -229,6 +232,12 @@ struct Avlnode {
 			_right = NULL;
 		}
 	}
+	Avlnode *end() {
+		Avlnode *current = root();
+		while (current->_right)
+			current = current->_right;
+		return current + 1;
+	}
 	Avlnode *next() {
 		Avlnode *current = this;
 		if (_right) {
@@ -240,7 +249,7 @@ struct Avlnode {
 		}
 		while (true) {
 			if (!current->_parent)
-				return NULL;
+				return end();
 			if (current->_parent->_left == current) {
 				return current->_parent;
 			}
@@ -364,7 +373,6 @@ class Avltree {
 		node *begin() const {
 			if (!_root) return NULL;
 			node *search = _root;
-
 			while (search->_left) {
 				search = search->_left;
 			}
@@ -571,13 +579,15 @@ class map {
 	~map() {};
 	map (const map& x) : _comp(x._comp), _alloc(x._alloc) {
 		for (const_iterator first = x.begin(); first != x.end(); first++) {
-			std::cout << "copying elem " << first->first;
 			insert(*first);
 		}
 	}
 	//map& operator= (const map& x);
 	iterator begin() {return _tree.begin();};
-	const_iterator begin() const {return const_iterator(_tree.begin());};
+	const_iterator begin() const {
+		node *n = _tree.begin();
+		return const_iterator(n);
+	}
 	iterator end() {return _tree.end();};
 	const_iterator end() const {return iterator(_tree.end());};
 	bool empty() {return !_tree._root;}
