@@ -18,7 +18,8 @@ class ra_iterator : public general_iterator<random_access_iterator_tag, T, Dista
 	private:
 		typename base::pointer _pointer;
 	public:
-		ra_iterator(typename base::pointer p) : _pointer(p) {}
+		ra_iterator(typename base::pointer p) : _pointer(p) {} //TODO remove?
+		ra_iterator() : _pointer(NULL) {}
 		ra_iterator operator+(Distance a) const {
 			ra_iterator i = *this;
 			i._pointer += a;
@@ -60,10 +61,19 @@ class ra_iterator : public general_iterator<random_access_iterator_tag, T, Dista
 		op(!=)
 #undef op
 
-		T &operator*() const {
-			return *_pointer;
-		}
+		T* operator->() const { return _pointer; }
+		T& operator*() const { return *_pointer; }
 };
+
+template <typename T, typename Distance>
+class rev_ra_iterator : public general_iterator<random_access_iterator_tag, T, Distance> {
+	typedef general_iterator<random_access_iterator_tag, T, Distance> base;
+	private:
+		typename base::pointer _pointer;
+	public:
+		rev_ra_iterator(typename base::pointer p) : _pointer(p) {} //TODO remove?
+		rev_ra_iterator() : _pointer(NULL) {}
+}
 
 #define trait(a) typedef typename Iterator::a a
 template <class Iterator>
