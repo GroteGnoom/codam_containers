@@ -122,7 +122,7 @@ class rev_ra_iterator : public general_iterator<random_access_iterator_tag, T, D
 			return *this;
 		}
 		rev_ra_iterator &operator-=(Distance a) {
-			_pointer -= a;
+			_pointer += a;
 			return *this;
 		}
 		rev_ra_iterator &operator++() {
