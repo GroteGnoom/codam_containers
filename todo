@@ -16,7 +16,7 @@ do TODOs
 no new or delete where there should be an alloc;
 
 up next:
-//NOW for the line I'm working on
+	clang++ -fsanitize=address main.cpp -g -I.. && ./a.out
 	for vector operator = you should preserve the allocator
 	lots of things private?
 
