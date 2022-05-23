@@ -22,6 +22,10 @@ class node_iterator : public general_iterator<bidirectional_iterator_tag, Avlnod
 	}
 	node_iterator() : _pointer(NULL) {
 	}
+	node_iterator &operator=(const node_iterator &it) {
+		_pointer = it._pointer;
+		return *this;
+	}
 	bool operator == (const node_iterator &nodei) const { return _pointer == nodei._pointer; }
 	bool operator != (const node_iterator &nodei) const { return _pointer != nodei._pointer; }
 	//TODO operations
@@ -29,9 +33,18 @@ class node_iterator : public general_iterator<bidirectional_iterator_tag, Avlnod
 		_pointer = _pointer->next();
 		return *this;
 	}
+	node_iterator &operator--() {
+		_pointer = _pointer->previous();
+		return *this;
+	}
 	node_iterator &operator++(int) {
 		node_iterator &tmp = *this;
 		_pointer = _pointer->next();
+		return tmp;
+	}
+	node_iterator &operator--(int) {
+		node_iterator &tmp = *this;
+		_pointer = _pointer->previous();
 		return tmp;
 	}
 
@@ -40,12 +53,63 @@ class node_iterator : public general_iterator<bidirectional_iterator_tag, Avlnod
 	T& operator*() const { return _pointer->_elem; }
 
 	/*implicit conversion!*/
-	operator node_iterator< T, Compare, Alloc, const T*, const T&> () const
-	{
+	operator node_iterator< T, Compare, Alloc, const T*, const T&> () const {
 		//std::cout << "implcit node iterator conversion\n";
 		//node_iterator n = node_iterator<T, Compare, Alloc>(_pointer);
 		//node_iterator n2 = node_iterator<const T, Compare, Alloc>(_pointer);
 		return (node_iterator< T, Compare, Alloc, const T*, const T&>(_pointer));
+	}
+};
+
+//https://www.cplusplus.com/reference/iterator/reverse_iterator/
+template <typename T, class Compare, class Alloc, class Pointer = T*, class Reference = T& >
+class rev_node_iterator : public general_iterator<bidirectional_iterator_tag, Avlnode<T, Compare, Alloc> > {
+	typedef general_iterator<bidirectional_iterator_tag, Avlnode<T, Compare, Alloc> > base;
+	private:
+	typename base::pointer _pointer;
+	public:
+	rev_node_iterator(typename base::pointer p) : _pointer(p) {
+	}
+	rev_node_iterator() : _pointer(NULL) {
+	}
+	rev_node_iterator &operator=(const rev_node_iterator &it) {
+		_pointer = it._pointer;
+		return *this;
+	}
+	bool operator == (const rev_node_iterator &nodei) const { return _pointer == nodei._pointer; }
+	bool operator != (const rev_node_iterator &nodei) const { return _pointer != nodei._pointer; }
+	//TODO operations
+	rev_node_iterator &operator++() {
+		_pointer = _pointer->previous();
+		return *this;
+	}
+	rev_node_iterator &operator++(int) {
+		rev_node_iterator &tmp = *this;
+		_pointer = _pointer->previous();
+		return tmp;
+	}	
+	rev_node_iterator &operator--() {
+		_pointer = _pointer->next();
+		return *this;
+	}
+	rev_node_iterator &operator--(int) {
+		rev_node_iterator &tmp = *this;
+		_pointer = _pointer->next();
+		return tmp;
+	}
+
+
+
+	//https://stackoverflow.com/questions/21569483/c-overloading-dereference-operators
+	T* operator->() const { return &(_pointer->_elem); }
+	T& operator*() const { return _pointer->_elem; }
+
+	/*implicit conversion!*/
+	operator rev_node_iterator< T, Compare, Alloc, const T*, const T&> () const {
+		//std::cout << "implcit node iterator conversion\n";
+		//rev_node_iterator n = rev_node_iterator<T, Compare, Alloc>(_pointer);
+		//rev_node_iterator n2 = rev_node_iterator<const T, Compare, Alloc>(_pointer);
+		return (rev_node_iterator< T, Compare, Alloc, const T*, const T&>(_pointer));
 	}
 };
 
@@ -72,6 +136,8 @@ struct pair{
 	}
 };
 
+template <class T1, class T2>
+pair<T1, T2> make_pair(T1 t1, T2 t2) {return pair<T1, T2>(t1, t2);}
 
 template <class T1, class T2>
 std::ostream &operator<<(std::ostream &out, const pair<T1,T2> &p) {
@@ -248,6 +314,12 @@ struct Avlnode {
 			current = current->_right;
 		return current + 1;
 	}
+	Avlnode *rend() {
+		Avlnode *current = root();
+		while (current->_left)
+			current = current->_left;
+		return current - 1;
+	}
 	Avlnode *next() {
 		Avlnode *current = this;
 		if (_right) {
@@ -261,6 +333,24 @@ struct Avlnode {
 			if (!current->_parent)
 				return end();
 			if (current->_parent->_left == current) {
+				return current->_parent;
+			}
+			current = current->_parent;
+		}
+	}
+	Avlnode *previous() {
+		Avlnode *current = this;
+		if (_left) {
+			current = _left;
+			while (current->_right) {
+				current = current->_right;
+			}
+			return current;
+		}
+		while (true) {
+			if (!current->_parent)
+				return rend();
+			if (current->_parent->_right == current) {
 				return current->_parent;
 			}
 			current = current->_parent;
@@ -575,9 +665,9 @@ class map {
 	typedef size_t size_type;
 	typedef node_iterator<value_type, value_compare, Alloc> iterator;
 	typedef node_iterator<value_type, value_compare, Alloc, const value_type *, const value_type &> const_iterator;
+	typedef rev_node_iterator<value_type, value_compare, Alloc> reverse_iterator;
+	typedef rev_node_iterator<value_type, value_compare, Alloc, const value_type *, const value_type &> const_reverse_iterator;
 	
-	//typedef value_type * iterator; //TODO should not be just a pointer?
-	//typedef const value_type * const_iterator; //TODO
 	   //TODO reverse_itarator
 	   //TODO const_reverse_iterator
 	Avltree<value_type, value_compare, Alloc > _tree; //TODO private, public for debugging
@@ -608,8 +698,14 @@ class map {
 	}
 	iterator end() {return _tree.end();};
 	const_iterator end() const {return iterator(_tree.end());};
-	bool empty() {return !_tree._root;}
-	size_type size() {
+
+	reverse_iterator rbegin() {return _tree.end() - 1;};
+	const_reverse_iterator rbegin() const {return _tree.end() - 1;};
+	reverse_iterator rend() {return _tree.begin() - 1;};
+	const_reverse_iterator rend() const {return iterator(_tree.begin() - 1);};
+
+	bool empty() const {return !_tree._root;}
+	size_type size() const {
 		if (empty()) return 0;
 		return _tree._root->size();
 	}
@@ -627,6 +723,17 @@ class map {
 		pair<iterator, bool> retval(_tree.insert(val), true);
 		return retval;
 	}
+	iterator insert (iterator position, const value_type& val) {
+		//TODO hint?
+		pair<iterator,bool> p = insert(val);
+		return p.first;
+	}
+	template <class InputIterator>
+	void insert (InputIterator first, InputIterator last) {
+		for (;first != last; first++) {
+			insert(*first);
+		}
+	}
 	mapped_type &operator[] (const key_type &k) {
 		pair<iterator,bool> inserted = insert(pair<key_type, mapped_type>(k,mapped_type()));
 		return (*(inserted.first)).second;
@@ -636,6 +743,11 @@ class map {
 		p->erase();
 		_tree.reroot();
 	}
+	void erase (iterator first, iterator last) {
+		for (;first != last; first++) {
+			erase(first);
+		}
+	};
 	iterator find (const key_type& k) {
 		return _tree.find(pair<key_type, mapped_type>(k,mapped_type()));
 	}

@@ -16,14 +16,28 @@ template <typename T, typename Distance>
 class ra_iterator : public general_iterator<random_access_iterator_tag, T, Distance> {
 	typedef general_iterator<random_access_iterator_tag, T, Distance> base;
 	private:
-		typename base::pointer _pointer;
 	public:
-		ra_iterator(typename base::pointer p) : _pointer(p) {} //TODO remove?
+		typename base::pointer _pointer;
+		typedef ra_iterator<const T, Distance> const_iter;
+		ra_iterator(const typename base::pointer &p) : _pointer(p) {} //TODO remove?
+		ra_iterator(const ra_iterator &it) : _pointer(it._pointer) {}
+		ra_iterator &operator=(const ra_iterator &it) {
+			_pointer = it._pointer;
+			return *this;
+		}
 		ra_iterator() : _pointer(NULL) {}
 		ra_iterator operator+(Distance a) const {
 			ra_iterator i = *this;
 			i._pointer += a;
 			return i;
+		}
+		ra_iterator &operator+=(Distance a) {
+			_pointer += a;
+			return *this;
+		}
+		ra_iterator &operator-=(Distance a) {
+			_pointer -= a;
+			return *this;
 		}
 		ra_iterator &operator++() {
 			_pointer += 1;
@@ -48,11 +62,29 @@ class ra_iterator : public general_iterator<random_access_iterator_tag, T, Dista
 			i._pointer -= a;
 			return i;
 		}
+		T& operator[](size_t idx) {
+			return *(_pointer + idx);
+		}
+		const T& operator[](size_t idx) const {
+			return *(_pointer + idx);
+		}
 		typename base::difference_type operator-(const ra_iterator &rai) const {
 			return _pointer - rai._pointer;
 		}
+		typename base::difference_type operator-(ra_iterator<const T, Distance> &rai) const {
+			return _pointer - rai._pointer;
+		}
+		/*
+		operator ra_iterator< const T, Distance> () const {
+			return (ra_iterator< const T, Distance>(_pointer));
+		}
+		*/
+		operator const_iter () const
+		{
+			return (const_iter(_pointer));
+		}
 
-#define op(a) bool operator a (const ra_iterator &rai) const { return _pointer a rai._pointer; }
+#define op(a) bool operator a (const const_iter &rai) const { return _pointer a rai._pointer; }
 		op(<)
 		op(>)
 		op(<=)
@@ -60,7 +92,6 @@ class ra_iterator : public general_iterator<random_access_iterator_tag, T, Dista
 		op(==)
 		op(!=)
 #undef op
-
 		T* operator->() const { return _pointer; }
 		T& operator*() const { return *_pointer; }
 };
@@ -69,11 +100,77 @@ template <typename T, typename Distance>
 class rev_ra_iterator : public general_iterator<random_access_iterator_tag, T, Distance> {
 	typedef general_iterator<random_access_iterator_tag, T, Distance> base;
 	private:
-		typename base::pointer _pointer;
 	public:
+		typename base::pointer _pointer;
 		rev_ra_iterator(typename base::pointer p) : _pointer(p) {} //TODO remove?
 		rev_ra_iterator() : _pointer(NULL) {}
+		rev_ra_iterator(const rev_ra_iterator &it) : _pointer(it._pointer) {}
+		rev_ra_iterator &operator=(const rev_ra_iterator &it) {
+			_pointer = it._pointer;
+			return *this;
+		}
+		operator rev_ra_iterator< const T, Distance> () const {
+			return (rev_ra_iterator< const T, Distance>(_pointer));
+		}
+		rev_ra_iterator operator+(Distance a) const {
+			rev_ra_iterator i = *this;
+			i._pointer -= a;
+			return i;
+		}
+		rev_ra_iterator &operator+=(Distance a) {
+			_pointer -= a;
+			return *this;
+		}
+		rev_ra_iterator &operator-=(Distance a) {
+			_pointer -= a;
+			return *this;
+		}
+		rev_ra_iterator &operator++() {
+			_pointer -= 1;
+			return *this;
+		}
+		rev_ra_iterator &operator++(int) {
+			rev_ra_iterator &tmp = *this;
+			_pointer -= 1;
+			return tmp;
+		}
+		rev_ra_iterator &operator--() {
+			_pointer += 1;
+			return *this;
+		}
+		rev_ra_iterator &operator--(int) {
+			rev_ra_iterator &tmp = *this;
+			_pointer += 1;
+			return tmp;
+		}
+		rev_ra_iterator operator-(Distance a) const {
+			rev_ra_iterator i = *this;
+			i._pointer += a;
+			return i;
+		}
+		T& operator[](size_t idx) {
+			return *(_pointer - idx);
+		}
+		const T& operator[](size_t idx) const {
+			return *(_pointer - idx);
+		}
+		typename base::difference_type operator-(rev_ra_iterator<const T, Distance> &rai) const {
+			return rai._pointer - _pointer;
+		}
+		T* operator->() const { return _pointer; }
+		T& operator*() const { return *_pointer; }
+};
+
+template <typename T, typename Distance>
+ra_iterator<T, Distance> operator+(ptrdiff_t a, const ra_iterator<T, Distance> &b) {
+	return b + a;
 }
+
+template <typename T, typename Distance>
+rev_ra_iterator<T, Distance> operator+(ptrdiff_t a, const rev_ra_iterator<T, Distance> &b) {
+	return b + a;
+}
+
 
 #define trait(a) typedef typename Iterator::a a
 template <class Iterator>
@@ -118,8 +215,10 @@ class vector {
 	typedef const T* const_pointer;
 	typedef size_t size_type;
 	typedef ra_iterator<T, size_type> iterator;
-	typedef const iterator const_iterator;
-	//typedef reverse_iterator //TODO
+	typedef ra_iterator<const T, size_type> const_iterator;
+	//typedef const iterator const_iterator; //TODO wrong, right? should be const T, not const iterator
+	typedef rev_ra_iterator<T, size_type> reverse_iterator;
+	typedef rev_ra_iterator<const T, size_type> const_reverse_iterator;
 	typedef ptrdiff_t difference_type; //TODO is it always ptrdiff?
 	//typedef reverse_ra_iterator<T, size_type> reverse_iterator;
 	private:
@@ -199,17 +298,26 @@ class vector {
 	iterator begin() {
 		return iterator(_data);
 	}
-
-	const iterator begin() const {
+	const_iterator begin() const {
 		return iterator(_data);
 	}
-
+	reverse_iterator rbegin() {
+		return reverse_iterator(_data + _size - 1);
+	}
+	const_reverse_iterator rbegin() const {
+		return reverse_iterator(_data + _size - 1);
+	}
 	iterator end() {
 		return begin() + _size;
 	}
-
-	const iterator end() const {
+	const_iterator end() const {
 		return begin() + _size;
+	}
+	reverse_iterator rend() {
+		return _data -1;
+	}
+	const_reverse_iterator rend() const {
+		return _data -1;;
 	}
 
 	//TODO: rbegin, rend
@@ -416,9 +524,7 @@ bool lexicographical_compare(it1 b1, it1 e1, it2 b2, it2 e2) {
 }
 
 template <typename it1, typename it2>
-bool equal(it1 b1, it1 e1, it2 b2, it2 e2) {
-	if (e1 - b1 != e2 - b2)
-		return false;
+bool equal(it1 b1, it1 e1, it2 b2) {
 	while (true) {
 		if (b1 >= e1)
 			return true;
@@ -429,9 +535,22 @@ bool equal(it1 b1, it1 e1, it2 b2, it2 e2) {
 	}
 }
 
+template <class InputIterator1, class InputIterator2, class BinaryPredicate>
+bool equal (InputIterator1 b1, InputIterator1 e1,
+		InputIterator2 b2, BinaryPredicate pred) {
+	while (true) {
+		if (b1 >= e1)
+			return true;
+		if (!pred(*b1, *b2))
+			return false;
+		b1++;
+		b2++;
+	}
+}
+
 template <class T, class Alloc>
 bool operator== (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs) {
-	return ft::equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+	return equal(lhs.begin(), lhs.end(), rhs.begin());
 }
 
 template <class T, class Alloc>
