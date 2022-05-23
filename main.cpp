@@ -54,12 +54,12 @@ void capactiy_print(vector<T> &v) {
 }
 
 #define check_compares(op) do { \
-	vector<std::string> v1(5, "bla"); \
-	vector<std::string> v2(4, "bla"); \
-	std::cout << "one is shorter: " << (v1 op v2) << "\n"; \
-	v2.push_back("ble"); \
+	vector<std::string> v1(4, "bla"); \
+	vector<std::string> v2(5, "bla"); \
+	std::cout << "first is shorter: " << (v1 op v2) << "\n"; \
+	v1.push_back("ble"); \
 	std::cout << "last string is not equal: " << (v1 op v2) << "\n"; \
-	v2[4] = "bla"; \
+	v1[4] = "bla"; \
 	std::cout << "equal: " << (v1 op v2) << "\n"; \
 } while (0) \
 

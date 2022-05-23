@@ -724,6 +724,7 @@ class map {
 		return retval;
 	}
 	iterator insert (iterator position, const value_type& val) {
+		(void) position;
 		//TODO hint?
 		pair<iterator,bool> p = insert(val);
 		return p.first;

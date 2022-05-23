@@ -508,7 +508,7 @@ class vector {
 template <typename it1, typename it2>
 bool lexicographical_compare(it1 b1, it1 e1, it2 b2, it2 e2) {
 	while (true) {
-		if (b1 >= e1 && b2 >= e1)
+		if (b1 >= e1 && b2 >= e2)
 			return false;
 		if (b1 >= e1)
 			return true;
@@ -525,14 +525,13 @@ bool lexicographical_compare(it1 b1, it1 e1, it2 b2, it2 e2) {
 
 template <typename it1, typename it2>
 bool equal(it1 b1, it1 e1, it2 b2) {
-	while (true) {
-		if (b1 >= e1)
-			return true;
+	while (b1 != e1) {
 		if (*b1 != *b2)
 			return false;
 		b1++;
 		b2++;
 	}
+	return true;
 }
 
 template <class InputIterator1, class InputIterator2, class BinaryPredicate>
@@ -550,7 +549,9 @@ bool equal (InputIterator1 b1, InputIterator1 e1,
 
 template <class T, class Alloc>
 bool operator== (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs) {
-	return equal(lhs.begin(), lhs.end(), rhs.begin());
+	if (lhs.size() != rhs.size())
+		return false;
+	return ft::equal(lhs.begin(), lhs.end(), rhs.begin());
 }
 
 template <class T, class Alloc>
