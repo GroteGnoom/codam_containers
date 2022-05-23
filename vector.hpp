@@ -342,7 +342,7 @@ class vector {
 		}
 	}
 	size_type capacity() const {return _cap;}
-	bool empty() { return !_size; }
+	bool empty() const { return !_size; }
 	void reserve(size_type n) {
 		if (!_data) {
 			_cap = n;
