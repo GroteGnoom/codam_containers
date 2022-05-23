@@ -35,3 +35,9 @@ why doesn't the node* have to point to something const
 because you can't actually change the members of the tree, because that only has a root pointer, and the value of that pointer will not be changed
 and then the outside world will not notice a problem because te map itself converts it to a const_iterator
 only use iterators at the map level, the rest just uses pointers
+
+
+don't just resize when someone gives you an iterator in the thing
+
+
+
