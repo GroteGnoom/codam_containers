@@ -19,6 +19,7 @@ up next:
 	clang++ -fsanitize=address main.cpp -g -I.. && ./a.out
 	for vector operator = you should preserve the allocator
 	lots of things private?
+	make map more balanced
 
 check all nodes for rebalancing? or only parts where there has been an insertion or deletion?
 

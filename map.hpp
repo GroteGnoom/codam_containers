@@ -37,13 +37,13 @@ class node_iterator : public general_iterator<bidirectional_iterator_tag, Avlnod
 		_pointer = _pointer->previous();
 		return *this;
 	}
-	node_iterator &operator++(int) {
-		node_iterator &tmp = *this;
+	node_iterator operator++(int) {
+		node_iterator tmp = *this;
 		_pointer = _pointer->next();
 		return tmp;
 	}
-	node_iterator &operator--(int) {
-		node_iterator &tmp = *this;
+	node_iterator operator--(int) {
+		node_iterator tmp = *this;
 		_pointer = _pointer->previous();
 		return tmp;
 	}
@@ -83,8 +83,8 @@ class rev_node_iterator : public general_iterator<bidirectional_iterator_tag, Av
 		_pointer = _pointer->previous();
 		return *this;
 	}
-	rev_node_iterator &operator++(int) {
-		rev_node_iterator &tmp = *this;
+	rev_node_iterator operator++(int) {
+		rev_node_iterator tmp = *this;
 		_pointer = _pointer->previous();
 		return tmp;
 	}	
@@ -92,8 +92,8 @@ class rev_node_iterator : public general_iterator<bidirectional_iterator_tag, Av
 		_pointer = _pointer->next();
 		return *this;
 	}
-	rev_node_iterator &operator--(int) {
-		rev_node_iterator &tmp = *this;
+	rev_node_iterator operator--(int) {
+		rev_node_iterator tmp = *this;
 		_pointer = _pointer->next();
 		return tmp;
 	}
@@ -219,7 +219,7 @@ struct Avlnode {
 		//std::cout << " left child " << _left << "\n";
 		//std::cout << " parent" << _parent << "\n";
 		//std::cout << " this elem" << _elem << "\n";
-		Avlnode *x = this;
+		//std::cout << " right elem" << _right->_elem << "\n";
 		Avlnode *y = _right;
 		/*
 		   if (!y) return;
@@ -242,18 +242,21 @@ struct Avlnode {
 		   */
 		assert(y);
 		//if (!y) return;
-		x->_right = y->_left;
-		if (x->_parent)
+		this->_right = y->_left;
+		if (this->_parent)
 		{
-			if (x->_parent->_left == this) {
-				x->_parent->_left = y;
+			if (this->_parent->_left == this) {
+				this->_parent->_left = y;
 			} else {
-				x->_parent->_right = y;
+				this->_parent->_right = y;
 			}
 		}
-		y->_parent = x->_parent;
-		y->_left = x;
-		x->_parent = y;
+		y->_parent = this->_parent;
+		y->_left = this;
+		this->_parent = y;
+		if (this->_right)
+			this->_right->_parent = this;
+		//std::cout << "root after " << root()->_elem << "\n";
 	}
 	void right_rotate() {
 		Avlnode *parent = _parent;
@@ -325,6 +328,9 @@ struct Avlnode {
 		return current - 1;
 	}
 	Avlnode *next() {
+		//std::cout << "calling next from " << _elem << "\n";
+		//if (_parent) 
+			//std::cout << "with parent " << _parent->_elem << "\n";
 		Avlnode *current = this;
 		if (_right) {
 			current = _right;
@@ -334,11 +340,15 @@ struct Avlnode {
 			return current;
 		}
 		while (true) {
-			if (!current->_parent)
+			if (!current->_parent) {
+				//std::cout << "no next found \n";
 				return end();
+			}
 			if (current->_parent->_left == current) {
+				//std::cout << "right parent found \n";
 				return current->_parent;
 			}
+			//std::cout << "going to parent " << _parent->_elem << "\n";
 			current = current->_parent;
 		}
 	}
@@ -391,7 +401,8 @@ struct Avlnode {
 			left_rotate();
 		}
 	}
-	void erase() {
+	Avlnode *erase() {
+		/*returns root*/
 		//std::cout << "erasing node\n";
 		assert(_parent);
 		Avlnode* parent = _parent;
@@ -449,8 +460,8 @@ struct Avlnode {
 			//std::cout << "parent right left" << parent->_right->_left->_elem << "\n";
 			start_balance = next;
 		}
-		std::cout << "going to balance\n";
 		start_balance->after_erase_balance();
+		return start_balance->root();
 	}
 	/*
 	T* lower_bound(T a) {
@@ -766,8 +777,9 @@ class map {
 	}
 	void erase (iterator position) {
 		node *p = reinterpret_cast<node *>(&(*position));
-		p->erase();
-		_tree.reroot();
+		_tree._root = p->erase();
+		//std::cout << "new root: " << _tree._root->_elem << "\n";
+		//_tree.reroot();
 	}
 	void erase (iterator first, iterator last) {
 		for (;first != last; first++) {
