@@ -43,8 +43,8 @@ class ra_iterator : public general_iterator<random_access_iterator_tag, T, Dista
 			_pointer += 1;
 			return *this;
 		}
-		ra_iterator &operator++(int) {
-			ra_iterator &tmp = *this;
+		ra_iterator operator++(int) {
+			ra_iterator tmp = *this;
 			_pointer += 1;
 			return tmp;
 		}
@@ -52,8 +52,8 @@ class ra_iterator : public general_iterator<random_access_iterator_tag, T, Dista
 			_pointer -= 1;
 			return *this;
 		}
-		ra_iterator &operator--(int) {
-			ra_iterator &tmp = *this;
+		ra_iterator operator--(int) {
+			ra_iterator tmp = *this;
 			_pointer -= 1;
 			return tmp;
 		}
@@ -129,8 +129,8 @@ class rev_ra_iterator : public general_iterator<random_access_iterator_tag, T, D
 			_pointer -= 1;
 			return *this;
 		}
-		rev_ra_iterator &operator++(int) {
-			rev_ra_iterator &tmp = *this;
+		rev_ra_iterator operator++(int) {
+			rev_ra_iterator tmp = *this;
 			_pointer -= 1;
 			return tmp;
 		}
@@ -138,8 +138,8 @@ class rev_ra_iterator : public general_iterator<random_access_iterator_tag, T, D
 			_pointer += 1;
 			return *this;
 		}
-		rev_ra_iterator &operator--(int) {
-			rev_ra_iterator &tmp = *this;
+		rev_ra_iterator operator--(int) {
+			rev_ra_iterator tmp = *this;
 			_pointer += 1;
 			return tmp;
 		}
