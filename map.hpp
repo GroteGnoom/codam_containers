@@ -215,9 +215,12 @@ struct Avlnode {
 	}
 	*/
 	void left_rotate() {
+		//std::cout << " in left rotate " << _right << "\n";
+		//std::cout << " left child " << _left << "\n";
+		//std::cout << " parent" << _parent << "\n";
+		//std::cout << " this elem" << _elem << "\n";
 		Avlnode *x = this;
 		Avlnode *y = _right;
-		Avlnode *parent = _parent;
 		/*
 		   if (!y) return;
 		   if (y->left) {
@@ -237,19 +240,20 @@ struct Avlnode {
 		   y->left = x;
 		   x->parent = y;
 		   */
-		if (!y) return;
+		assert(y);
+		//if (!y) return;
 		x->_right = y->_left;
-		y->_left = x;
-		y->_parent = x->_parent;
-		x->_parent = y;
-		if (parent)
+		if (x->_parent)
 		{
-			if (parent->_left == this) {
-				parent->_left = y;
+			if (x->_parent->_left == this) {
+				x->_parent->_left = y;
 			} else {
-				parent->_right = y;
+				x->_parent->_right = y;
 			}
 		}
+		y->_parent = x->_parent;
+		y->_left = x;
+		x->_parent = y;
 	}
 	void right_rotate() {
 		Avlnode *parent = _parent;
@@ -366,7 +370,10 @@ struct Avlnode {
 		return 1 + lsize + rsize;
 	}
 	void after_erase_balance() {
+		//std::cout << "balancing from " << _elem;
+
 		if (get_balance() > 1) {
+			//std::cout << "positive unbalance\n";
 			if (_left->get_balance() >= 0) {
 				right_rotate();
 				return;
@@ -374,7 +381,9 @@ struct Avlnode {
 			_left->left_rotate();
 			right_rotate();
 		} else if (get_balance() < -1) {
+			//std::cout << "negative unbalance\n";
 			if (_right->get_balance() <= 0) {
+				//std::cout << "left rotate\n";
 				left_rotate();
 				return;
 			}
@@ -383,13 +392,20 @@ struct Avlnode {
 		}
 	}
 	void erase() {
+		//std::cout << "erasing node\n";
 		assert(_parent);
 		Avlnode* parent = _parent;
 		Avlnode* start_balance = _parent;
 		//https://stackoverflow.com/questions/3150942/is-delete-this-allowed-in-c9
 		if (!_left && !_right) {
-			if (parent->_left == this)
+			//std::cout << "erasing node with no left and right child, elem:" << _elem << "\n";
+			//std::cout << "parent:" << _parent->_elem << "\n";
+			//std::cout << "grandparent:" << _parent->_parent->_elem << "\n";
+			//std::cout << "sibling:" << _parent->_right->_elem << "\n";
+			if (parent->_left == this) {
+				//std::cout << "left of parent\n";
 				parent->_left = NULL;
+			}
 			else if (parent->_right == this)
 				parent->_right = NULL;
 			this->del();
@@ -433,6 +449,7 @@ struct Avlnode {
 			//std::cout << "parent right left" << parent->_right->_left->_elem << "\n";
 			start_balance = next;
 		}
+		std::cout << "going to balance\n";
 		start_balance->after_erase_balance();
 	}
 	/*
@@ -684,13 +701,21 @@ class map {
 				const allocator_type& alloc = allocator_type()) : _comp(comp), _alloc(alloc) {
 			for (; first != last; first++) insert(*first);
 		}
-	~map() {};
+	~map() {
+		clear();
+	};
 	map (const map& x) : _comp(x._comp), _alloc(x._alloc) {
 		for (const_iterator first = x.begin(); first != x.end(); first++) {
 			insert(*first);
 		}
 	}
-	//map& operator= (const map& x);
+	map& operator= (const map& x) {
+		this->~map();
+		for (const_iterator i = x.begin(); i != x.end(); i++) {
+			insert(*i);
+		}
+		return *this;
+	};
 	iterator begin() {return _tree.begin();};
 	const_iterator begin() const {
 		node *n = _tree.begin();
