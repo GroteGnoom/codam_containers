@@ -275,6 +275,8 @@ struct Avlnode {
 				parent->_right = x;
 			}
 		}
+		if (this->_left)
+			this->_left->_parent = this;
 	}
 	Avlnode *newnode(T elem) {
 		Avlnode *node = node_alloc.allocate(1);
@@ -403,14 +405,14 @@ struct Avlnode {
 	}
 	Avlnode *erase() {
 		/*returns root*/
-		//std::cout << "erasing node\n";
+		std::cout << "erasing node\n";
 		assert(_parent);
 		Avlnode* parent = _parent;
 		Avlnode* start_balance = _parent;
 		//https://stackoverflow.com/questions/3150942/is-delete-this-allowed-in-c9
 		if (!_left && !_right) {
-			//std::cout << "erasing node with no left and right child, elem:" << _elem << "\n";
-			//std::cout << "parent:" << _parent->_elem << "\n";
+			std::cout << "erasing node with no left and right child, elem:" << _elem << "\n";
+			std::cout << "parent:" << _parent->_elem << "\n";
 			//std::cout << "grandparent:" << _parent->_parent->_elem << "\n";
 			//std::cout << "sibling:" << _parent->_right->_elem << "\n";
 			if (parent->_left == this) {
@@ -421,16 +423,25 @@ struct Avlnode {
 				parent->_right = NULL;
 			this->del();
 		} else if (!_left) {
-			if (parent->_left == this)
+			if (parent->_left == this) {
 				parent->_left = _right;
-			else if (parent->_right == this)
+				_right->_parent = parent;
+			}
+			else if (parent->_right == this) {
 				parent->_right = _right;
+				_right->_parent = parent;
+			}
 			this->del();
 		} else if (!_right) {
-			if (parent->_left == this)
+			std::cout << "erasing node only a left child, elem:" << _elem << "\n";
+			if (parent->_left == this) {
 				parent->_left = _left;
-			else if (parent->_right == this)
+				_left->_parent = parent;
+			}
+			else if (parent->_right == this) {
 				parent->_right = _left;
+				_left->_parent = parent;
+			}
 			this->del();
 		} else {
 			Avlnode *next = _right;
@@ -782,8 +793,17 @@ class map {
 		//_tree.reroot();
 	}
 	void erase (iterator first, iterator last) {
+		//TODO proper solution
+		key_type* keys = new key_type[size()];
+		int i = 0;
 		for (;first != last; first++) {
-			erase(first);
+			keys[i] = first->first;
+			std::cout << "adding to removal list: " << keys[i] << "\n";
+			i++;
+		}
+		for (i = i - 1;i >= 0; i--) {
+			std::cout << "removing " << keys[i] << "\n";
+			erase(keys[i]);
 		}
 	};
 	iterator find (const key_type& k) {
@@ -803,7 +823,6 @@ class map {
 		erase(i);
 		return 1;
 	}
-	 //void erase (iterator first, iterator last); //TODO
 
 	 void swap (map& x) {
 		 node *s = _tree._root;
