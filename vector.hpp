@@ -334,12 +334,15 @@ class vector {
 			}
 			_size = n;
 		} else {
-			reserve(n);
+			size_t newcap = _cap;
+			if (n > _cap)
+				newcap = std::max(n, _cap * 2);
+			reserve(newcap);
 			for (size_type i = _size; i < n; i++) {
 				_data[i] = val;
 			}
 			_size = n;
-			_cap = n;
+			_cap = newcap;
 		}
 	}
 	size_type capacity() const {return _cap;}
@@ -407,13 +410,15 @@ class vector {
 			if (!(first < last) && !(first == last)) {
 				throw std::length_error("vector");
 			}
-			resize(last - first);
+			reserve(last - first);
+			_size = last - first;
 			for (size_type i = 0; first < last; first++) {
 				_data[i++] = *first;
 			}
 		}
 	void assign (size_type n, const value_type& val) {
-		resize(n);
+		reserve(n);
+		_size = n;
 		for (size_type i = 0; i < n; i++) {
 			_data[i] = val;
 		}
