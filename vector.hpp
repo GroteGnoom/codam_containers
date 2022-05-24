@@ -281,12 +281,13 @@ class vector {
 
 	//copy assignment
 	vector &operator=(const vector& v) {
-		this->~vector<T>(); //TODO slower than necessary, could use old allocation if new size <= old cap
-		_alloc = v._alloc;
+		if (_cap < v._cap) {
+			this->~vector<T>();
+			_data = _alloc.allocate(v._cap);
+			_cap = v._cap;
+		}
+		//_alloc = v._alloc; //TODO check if this is ok
 		_size = v._size;
-		_cap = v._cap;
-		if (_cap)
-			_data = _alloc.allocate(_cap);
 		for (size_type i = 0; i < _size; i++) {
 			_data[i] = v._data[i];
 		}
@@ -421,8 +422,10 @@ class vector {
 
 	void push_back (const value_type& val) {
 		if (_cap == _size) {
-			if (_cap * 2 + 1 <= max_size())
-				reserve(_cap * 2 + 1);
+			if (_cap == 0)
+				reserve(1);
+			else if (_cap * 2 <= max_size())
+				reserve(_cap * 2);
 			else
 				reserve(_cap + 1);
 		}
