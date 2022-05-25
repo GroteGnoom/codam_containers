@@ -367,6 +367,9 @@ struct Avlnode {
 		}
 	}
 	Avlnode *previous() {
+		if (this == begin()) {
+			return rend();
+		}
 		if (this == end()) {
 			return rbegin();
 		}
