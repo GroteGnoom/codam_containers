@@ -203,6 +203,12 @@ struct Avlnode {
 			a = a->_parent;
 		return a;
 	}
+	const Avlnode *root() const {
+		Avlnode *a = this;
+		while (a->_parent)
+			a = a->_parent;
+		return a;
+	}
 	void left_rotate() {
 		Avlnode *y = _right;
 		assert(y);
@@ -245,24 +251,6 @@ struct Avlnode {
 		Avlnode *node = node_alloc.allocate(1);
 		node_alloc.construct(node, Avlnode(elem, this, _begin_sentinel, _end_sentinel));
 		return node;
-	}
-	Avlnode *insert(T elem) {
-		if (Compare()(elem, _elem)) {
-			if (_left) {
-				return _left->insert(elem);
-			}
-			else {
-				_left = this->newnode(elem);
-				return _left;
-			}
-		} else {
-			if (_right)
-				return _right->insert(elem);
-			else {
-				_right = this->newnode(elem);
-				return _right;
-			}
-		}
 	}
 	void del() {
 			this->~Avlnode();
@@ -487,13 +475,33 @@ class Avltree {
 			if (!_root) {
 				_root = newroot(elem);
 				return _root;
-			} else {
-				node *new_node = _root->insert(elem);
-				reroot();
-				rebalance(new_node);
-				reroot();
-				return new_node;
 			}
+			node *current = _root;
+			while (true) {
+				if (Compare()(elem, current->_elem)) {
+					if (current->_left) {
+						current = current->_left;
+					}
+					else {
+						current->_left = current->newnode(elem);
+						current = current->_left;
+						break;
+					}
+				} else {
+					if (current->_right) {
+						current = current->_right;
+					}
+					else {
+						current->_right = current->newnode(elem);
+						current = current->_right;
+						break;
+					}
+				}
+			}
+			reroot();
+			rebalance(current);
+			reroot();
+			return current;
 		}
 		~Avltree() {
 			_begin_sentinel->del();
