@@ -54,9 +54,6 @@ class node_iterator : public general_iterator<bidirectional_iterator_tag, Avlnod
 
 	/*implicit conversion!*/
 	operator node_iterator< T, Compare, Alloc, const T*, const T&> () const {
-		//std::cout << "implcit node iterator conversion\n";
-		//node_iterator n = node_iterator<T, Compare, Alloc>(_pointer);
-		//node_iterator n2 = node_iterator<const T, Compare, Alloc>(_pointer);
 		return (node_iterator< T, Compare, Alloc, const T*, const T&>(_pointer));
 	}
 };
@@ -106,9 +103,6 @@ class rev_node_iterator : public general_iterator<bidirectional_iterator_tag, Av
 
 	/*implicit conversion!*/
 	operator rev_node_iterator< T, Compare, Alloc, const T*, const T&> () const {
-		//std::cout << "implcit node iterator conversion\n";
-		//rev_node_iterator n = rev_node_iterator<T, Compare, Alloc>(_pointer);
-		//rev_node_iterator n2 = rev_node_iterator<const T, Compare, Alloc>(_pointer);
 		return (rev_node_iterator< T, Compare, Alloc, const T*, const T&>(_pointer));
 	}
 };
@@ -165,7 +159,7 @@ bool operator>= (const pair<T1,T2>& a, const pair<T1,T2>& b) { return !(a<b); }
 
 template <class T, class Compare, class Alloc>
 struct Avlnode {
-	T _elem; //if this stays as first element, I can easily switch between node and element iterators
+	T _elem;
 	Avlnode *_left;
 	Avlnode *_right;
 	Avlnode *_parent;
@@ -209,42 +203,9 @@ struct Avlnode {
 			a = a->_parent;
 		return a;
 	}
-	/*
-	const Avlnode *root() const {
-		const Avlnode *a = this;
-		while (a->_parent)
-			a = a->_parent;
-		return a;
-	}
-	*/
 	void left_rotate() {
-		//std::cout << " in left rotate " << _right << "\n";
-		//std::cout << " left child " << _left << "\n";
-		//std::cout << " parent" << _parent << "\n";
-		//std::cout << " this elem" << _elem << "\n";
-		//std::cout << " right elem" << _right->_elem << "\n";
 		Avlnode *y = _right;
-		/*
-		   if (!y) return;
-		   if (y->left) {
-		   x->right = y->left;
-		   x->right.parent = x;
-		   }
-		   if (!x->parent)
-		   y->parent = NULL;
-		   else if (x == x->parent->left)
-		   {
-		   x->parent->left = y;
-		   y->parent = x->parent;
-		   } else {
-		   x->parent->right = y;
-		   y->parent = x->parent;
-		   }
-		   y->left = x;
-		   x->parent = y;
-		   */
 		assert(y);
-		//if (!y) return;
 		this->_right = y->_left;
 		if (this->_parent)
 		{
@@ -259,7 +220,6 @@ struct Avlnode {
 		this->_parent = y;
 		if (this->_right)
 			this->_right->_parent = this;
-		//std::cout << "root after " << root()->_elem << "\n";
 	}
 	void right_rotate() {
 		Avlnode *parent = _parent;
@@ -342,9 +302,6 @@ struct Avlnode {
 		if (this == rend()) {
 			return begin();
 		}
-		//std::cout << "calling next from " << _elem << "\n";
-		//if (_parent) 
-			//std::cout << "with parent " << _parent->_elem << "\n";
 		Avlnode *current = this;
 		if (_right) {
 			current = _right;
@@ -355,14 +312,11 @@ struct Avlnode {
 		}
 		while (true) {
 			if (!current->_parent) {
-				//std::cout << "no next found \n";
 				return end();
 			}
 			if (current->_parent->_left == current) {
-				//std::cout << "right parent found \n";
 				return current->_parent;
 			}
-			//std::cout << "going to parent " << _parent->_elem << "\n";
 			current = current->_parent;
 		}
 	}
@@ -400,10 +354,7 @@ struct Avlnode {
 		return 1 + lsize + rsize;
 	}
 	void after_erase_balance() {
-		//std::cout << "balancing from " << _elem;
-
 		if (get_balance() > 1) {
-			//std::cout << "positive unbalance\n";
 			if (_left->get_balance() >= 0) {
 				right_rotate();
 				return;
@@ -411,9 +362,7 @@ struct Avlnode {
 			_left->left_rotate();
 			right_rotate();
 		} else if (get_balance() < -1) {
-			//std::cout << "negative unbalance\n";
 			if (_right->get_balance() <= 0) {
-				//std::cout << "left rotate\n";
 				left_rotate();
 				return;
 			}
@@ -423,16 +372,11 @@ struct Avlnode {
 	}
 	Avlnode *erase() {
 		/*returns root*/
-		//std::cout << "erasing node\n";
 		Avlnode* parent = _parent;
 		Avlnode* start_balance = _parent;
 		//https://stackoverflow.com/questions/3150942/is-delete-this-allowed-in-c9
 		if (!_left && !_right) {
-			//std::cout << "erasing node with no left and right child, elem:" << _elem << "\n";
-			//std::cout << "grandparent:" << _parent->_parent->_elem << "\n";
-			//std::cout << "sibling:" << _parent->_right->_elem << "\n";
 			if (parent && parent->_left == this) {
-				//std::cout << "left of parent\n";
 				parent->_left = NULL;
 			}
 			else if (parent && parent->_right == this)
@@ -469,7 +413,6 @@ struct Avlnode {
 			}
 			this->del();
 		} else {
-			//assert(_parent);
 			Avlnode *next = _right;
 			int steps = 0;
 			while (next->_left) {
@@ -496,9 +439,6 @@ struct Avlnode {
 			next->_left = _left;
 			next->_right = _right;
 			this->del();
-			//std::cout << "parent right" << parent->_right->_elem << "\n";
-			//std::cout << "parent right right" << parent->_right->_right->_elem << "\n";
-			//std::cout << "parent right left" << parent->_right->_left->_elem << "\n";
 			start_balance = next;
 		}
 		if (start_balance) {
@@ -509,17 +449,10 @@ struct Avlnode {
 			return NULL;
 		}
 	}
-	/*
-	T* lower_bound(T a) {
-		return const_cast<T *>(const_cast <const Avlnode <T, Compare, Alloc> &> (*this).lower_bound(a));
-	}
-	*/
 };
 
 template <class T, class Compare, class Alloc>
 class Avltree {
-	//typedef node_iterator<T, Compare, Alloc> iterator;
-	//typedef node_iterator<const T, Compare, Alloc> const_iterator;
 	typedef Avlnode<T, Compare, Alloc> node;
 	typedef Avlnode<const T, Compare, Alloc> const_node;
 	typename Alloc::template rebind<node>::other node_alloc;
@@ -738,23 +671,6 @@ class Avltree {
 		}
 };
 
-/*
-   template < class Key, class Value, class Compare>
-   bool compare_key(pair<Key, Value> p1, pair<Key, Value> p2) {
-   return Compare(p1.first, p2.first);
-   }
-   */
-
-//TODO should inherit from binary_function? Or maybe it doesn't matter because it's only used internally?
-/*
-template <class Key, class Value, class Compare>
-struct compare_key {
-	bool operator() (pair<Key, Value> p1, pair<Key, Value> p2) {
-		return Compare()(p1.first, p2.first);
-	}
-};
-*/
-
 template < class Key,
  class T,
  class Compare = std::less<Key>,
@@ -795,11 +711,8 @@ class map {
 	typedef node_iterator<value_type, value_compare, Alloc, const value_type *, const value_type &> const_iterator;
 	typedef rev_node_iterator<value_type, value_compare, Alloc> reverse_iterator;
 	typedef rev_node_iterator<value_type, value_compare, Alloc, const value_type *, const value_type &> const_reverse_iterator;
-	
-	   //TODO reverse_itarator
-	   //TODO const_reverse_iterator
-	Avltree<value_type, value_compare, Alloc > _tree; //TODO private, public for debugging
 	private:
+	Avltree<value_type, value_compare, Alloc > _tree;
 	key_compare _comp;
 	allocator_type _alloc;
 	typedef Avlnode<value_type, value_compare, Alloc> node;

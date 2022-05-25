@@ -16,11 +16,10 @@ do TODOs
 no new or delete where there should be an alloc;
 
 up next:
-	be able to erase the root
-	make in /ext
-	clang++ -fsanitize=address main.cpp -g -I.. && ./a.out
+	optimize!
+	clean up!
 	for vector operator = you should preserve the allocator
-	lots of things private?
+	lots of things private
 	make map more balanced
 
 check all nodes for rebalancing? or only parts where there has been an insertion or deletion?
