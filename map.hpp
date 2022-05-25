@@ -339,6 +339,9 @@ struct Avlnode {
 		return current;
 	}
 	Avlnode *next() {
+		if (this == rend()) {
+			return begin();
+		}
 		//std::cout << "calling next from " << _elem << "\n";
 		//if (_parent) 
 			//std::cout << "with parent " << _parent->_elem << "\n";
@@ -364,6 +367,9 @@ struct Avlnode {
 		}
 	}
 	Avlnode *previous() {
+		if (this == end()) {
+			return rbegin();
+		}
 		Avlnode *current = this;
 		if (_left) {
 			current = _left;
@@ -521,6 +527,8 @@ class Avltree {
 			node *np = node_alloc.allocate(1);
 			node n(elem, NULL, _begin_sentinel, _end_sentinel);
 			node_alloc.construct(np, n);
+			_begin_sentinel->_parent = np;
+			_end_sentinel->_parent = np;
 			return np;
 		}
 		node *newsentinel(T elem ) {
@@ -545,9 +553,9 @@ class Avltree {
 				return _root;
 			} else {
 				node *new_node = _root->insert(elem);
-				_root = _root->root();
+				reroot();
 				rebalance(new_node);
-				_root = _root->root();
+				reroot();
 				return new_node;
 			}
 		}
@@ -621,6 +629,8 @@ class Avltree {
 		}
 		void reroot() {
 			_root = _root->root();
+			_begin_sentinel->_parent = _root;
+			_end_sentinel->_parent = _root;
 		}
 		node *lower_bound(const T a) const {
 			//std::cout << "start of lower bound\n";
