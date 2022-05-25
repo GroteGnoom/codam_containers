@@ -697,6 +697,17 @@ class Avltree {
 			}
 			return found;
 		}
+		void swap(Avltree &x) {
+		 node *s = _root;
+		 _root = x._root;
+		 x._root = s;
+		 s = _begin_sentinel;
+		 _begin_sentinel = x._begin_sentinel;
+		 x._begin_sentinel = s;
+		 s = _end_sentinel;
+		 _end_sentinel = x._end_sentinel;
+		 x._end_sentinel = s;
+		}
 	private:
 		void rebalance(node *new_node) {
 			int balance;
@@ -898,9 +909,7 @@ class map {
 	}
 
 	 void swap (map& x) {
-		 node *s = _tree._root;
-		 _tree._root = x._tree._root;
-		 x._tree._root = s;
+		 _tree.swap(x._tree);
 	 }
 	//https://stackoverflow.com/questions/14187006/is-calling-destructor-manually-always-a-sign-of-bad-design
 	 void clear() {
