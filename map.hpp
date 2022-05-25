@@ -550,23 +550,25 @@ class Avltree {
 			if (!_root) return begin();
 			return _begin_sentinel;
 		}
-		node *find_recur(const T a, node *n) const {
-			if (comp(a, n->_elem)){
-				if (!n->_left)
-					return NULL;
-				return find_recur(a, n->_left);
-			} else if (Compare()(n->_elem, a)){
-				if (!n->_right)
-					return NULL;
-				return find_recur(a, n->_right);
-			} else {
-				return n;
-			}
-		}
 		node *find(const T a) const {
 			if (!_root)
 				return end();
-			node* found = find_recur(a, _root);
+			node *found = NULL;
+			node *current = _root;
+			while (true) {
+				if (comp(a, current->_elem)){
+					if (!current->_left)
+						break;
+					current = current->_left;
+				} else if (comp(current->_elem, a)){
+					if (!current->_right)
+						break;
+					current = current->_right;
+				} else {
+					found = current;
+					break;
+				}
+			}
 			if (found)
 				return found;
 			return end();
