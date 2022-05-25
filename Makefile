@@ -35,6 +35,7 @@ test:
 	$(MAKE) re DEBUG=1
 	./containers > output
 	diff -a std_output output
+	$(MAKE) -C ext #TODO remove
 	#$(MAKE) re DEBUG=1 SRC=test_avl.cpp NAME=test_avl
 	#./test_avl
 
