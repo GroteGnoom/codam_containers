@@ -405,25 +405,28 @@ struct Avlnode {
 	}
 	Avlnode *erase() {
 		/*returns root*/
-		std::cout << "erasing node\n";
-		assert(_parent);
+		//std::cout << "erasing node\n";
 		Avlnode* parent = _parent;
 		Avlnode* start_balance = _parent;
 		//https://stackoverflow.com/questions/3150942/is-delete-this-allowed-in-c9
 		if (!_left && !_right) {
-			std::cout << "erasing node with no left and right child, elem:" << _elem << "\n";
-			std::cout << "parent:" << _parent->_elem << "\n";
+			//std::cout << "erasing node with no left and right child, elem:" << _elem << "\n";
 			//std::cout << "grandparent:" << _parent->_parent->_elem << "\n";
 			//std::cout << "sibling:" << _parent->_right->_elem << "\n";
-			if (parent->_left == this) {
+			if (parent && parent->_left == this) {
 				//std::cout << "left of parent\n";
 				parent->_left = NULL;
 			}
-			else if (parent->_right == this)
+			else if (parent && parent->_right == this)
 				parent->_right = NULL;
 			this->del();
 		} else if (!_left) {
-			if (parent->_left == this) {
+			if (!parent) {
+				_right->_parent = NULL;
+				Avlnode *right = _right;
+				this->del();
+				return right;
+			} else if (parent->_left == this) {
 				parent->_left = _right;
 				_right->_parent = parent;
 			}
@@ -433,8 +436,12 @@ struct Avlnode {
 			}
 			this->del();
 		} else if (!_right) {
-			std::cout << "erasing node only a left child, elem:" << _elem << "\n";
-			if (parent->_left == this) {
+			if (!parent) {
+				_left->_parent = NULL;
+				Avlnode *left = _left;
+				this->del();
+				return left;
+			} else if (parent->_left == this) {
 				parent->_left = _left;
 				_left->_parent = parent;
 			}
@@ -444,6 +451,7 @@ struct Avlnode {
 			}
 			this->del();
 		} else {
+			//assert(_parent);
 			Avlnode *next = _right;
 			int steps = 0;
 			while (next->_left) {
@@ -458,10 +466,14 @@ struct Avlnode {
 			/* next goes in place of this */
 			/* I can't replace the internals (like with copy assigment) easily
 			   because the default allocator uses a const key*/
-			if (parent->_left == this)
-				parent->_left = next;
-			else if (parent->_right == this) {
+			if (!parent) {
+				next->_parent = NULL;
+			} else if (parent->_left == this) {
+				parent->_left = next; //TODO set next->_parent 
+				next->_parent = parent;
+			} else if (parent->_right == this) {
 				parent->_right = next;
+				next->_parent = parent;
 			}
 			next->_left = _left;
 			next->_right = _right;
@@ -471,8 +483,13 @@ struct Avlnode {
 			//std::cout << "parent right left" << parent->_right->_left->_elem << "\n";
 			start_balance = next;
 		}
-		start_balance->after_erase_balance();
-		return start_balance->root();
+		if (start_balance) {
+			start_balance->after_erase_balance();
+			return start_balance->root();
+		} else {
+			/*removed root*/
+			return NULL;
+		}
 	}
 	/*
 	T* lower_bound(T a) {
@@ -798,13 +815,12 @@ class map {
 		int i = 0;
 		for (;first != last; first++) {
 			keys[i] = first->first;
-			std::cout << "adding to removal list: " << keys[i] << "\n";
 			i++;
 		}
 		for (i = i - 1;i >= 0; i--) {
-			std::cout << "removing " << keys[i] << "\n";
 			erase(keys[i]);
 		}
+		delete[] keys;
 	};
 	iterator find (const key_type& k) {
 		return _tree.find(pair<key_type, mapped_type>(k,mapped_type()));
