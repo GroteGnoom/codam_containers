@@ -39,5 +39,4 @@ only use iterators at the map level, the rest just uses pointers
 
 don't just resize when someone gives you an iterator in the thing
 
-
-
+when using last + 1 as the end pointer, you can only recognize the end when you're not at the end, because you need something to dereference. So one way to fix that is to make end and actual node.

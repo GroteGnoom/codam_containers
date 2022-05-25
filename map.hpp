@@ -169,10 +169,13 @@ struct Avlnode {
 	Avlnode *_left;
 	Avlnode *_right;
 	Avlnode *_parent;
-	Avlnode(T elem, Avlnode<T, Compare, Alloc> *parent) : _elem(elem), _left(NULL), _right(NULL), _parent(parent) {}
+	Avlnode *_begin_sentinel;
+	Avlnode *_end_sentinel;
+	Avlnode(T elem, Avlnode *parent, Avlnode *begin_sentinel, Avlnode *end_sentinel) : _elem(elem), _left(NULL), _right(NULL), _begin_sentinel(begin_sentinel), _end_sentinel(end_sentinel), _parent(parent) {}
+	Avlnode(Avlnode *root, Avlnode *begin_sentinel, Avlnode *end_sentinel) : _elem(T()), _left(NULL), _right(NULL), _parent(root), _begin_sentinel(begin_sentinel), _end_sentinel(end_sentinel) {}
 	Compare comp;
 	typename Alloc::template rebind<Avlnode>::other node_alloc;
-	Avlnode(const Avlnode &a) : _elem(a._elem), _left(a._left), _right(a._right), _parent(a._parent), comp(a.comp)  {
+	Avlnode(const Avlnode &a) : _elem(a._elem), _left(a._left), _right(a._right), _parent(a._parent), _begin_sentinel(a._begin_sentinel), _end_sentinel(a._end_sentinel), comp(a.comp)  {
 	}
 	Avlnode &operator=(const Avlnode &a) {
 		_elem = a._elem;
@@ -280,7 +283,7 @@ struct Avlnode {
 	}
 	Avlnode *newnode(T elem) {
 		Avlnode *node = node_alloc.allocate(1);
-		node_alloc.construct(node, Avlnode(elem, this));
+		node_alloc.construct(node, Avlnode(elem, this, _begin_sentinel, _end_sentinel));
 		return node;
 	}
 	Avlnode *insert(T elem) {
@@ -318,16 +321,22 @@ struct Avlnode {
 		}
 	}
 	Avlnode *end() {
+		return _end_sentinel;
+	}
+	Avlnode *rbegin() {
 		Avlnode *current = root();
 		while (current->_right)
 			current = current->_right;
-		return current + 1;
+		return current;
 	}
 	Avlnode *rend() {
+		return _begin_sentinel;
+	}
+	Avlnode *begin() {
 		Avlnode *current = root();
 		while (current->_left)
 			current = current->_left;
-		return current - 1;
+		return current;
 	}
 	Avlnode *next() {
 		//std::cout << "calling next from " << _elem << "\n";
@@ -469,7 +478,7 @@ struct Avlnode {
 			if (!parent) {
 				next->_parent = NULL;
 			} else if (parent->_left == this) {
-				parent->_left = next; //TODO set next->_parent 
+				parent->_left = next;
 				next->_parent = parent;
 			} else if (parent->_right == this) {
 				parent->_right = next;
@@ -506,15 +515,30 @@ class Avltree {
 	typedef Avlnode<const T, Compare, Alloc> const_node;
 	typename Alloc::template rebind<node>::other node_alloc;
 	public:
+		node *_begin_sentinel;
+		node *_end_sentinel;
 		node *newroot(T elem ) {
 			node *np = node_alloc.allocate(1);
-			node n(elem, NULL);
+			node n(elem, NULL, _begin_sentinel, _end_sentinel);
+			node_alloc.construct(np, n);
+			return np;
+		}
+		node *newsentinel(T elem ) {
+			node *np = node_alloc.allocate(1);
+			node n(elem, NULL, NULL, NULL);
 			node_alloc.construct(np, n);
 			return np;
 		}
 		Compare comp;
 		Avlnode<T, Compare, Alloc> *_root;
-		Avltree() : _root(NULL) {}
+		Avltree() : _root(NULL) {
+			_begin_sentinel = newsentinel(T());
+			_end_sentinel = newsentinel(T());
+			_begin_sentinel->_begin_sentinel = _begin_sentinel;
+			_begin_sentinel->_end_sentinel = _end_sentinel;
+			_end_sentinel->_begin_sentinel = _begin_sentinel;
+			_end_sentinel->_end_sentinel = _end_sentinel;
+		}
 		node* insert(T elem) {
 			if (!_root) {
 				_root = newroot(elem);
@@ -528,6 +552,14 @@ class Avltree {
 			}
 		}
 		~Avltree() {
+			_begin_sentinel->del();
+			_end_sentinel->del();
+			if (!_root) return;
+			_root->del_children();
+			_root->del();
+			_root = NULL;
+		}
+		void clear() {
 			if (!_root) return;
 			_root->del_children();
 			_root->del();
@@ -542,6 +574,7 @@ class Avltree {
 			return search;
 		}
 		node *end() const {
+			/*
 			if (!_root) return begin();
 			node *search = _root;
 
@@ -549,6 +582,21 @@ class Avltree {
 				search = search->_right;
 			}
 			return search + 1;
+			*/
+			if (!_root) return begin();
+			return _end_sentinel;
+		}
+		node *rbegin() const {
+			if (!_root) return begin();
+			node *search = _root;
+			while (search->_right) {
+				search = search->_right;
+			}
+			return search;
+		}
+		node *rend() const {
+			if (!_root) return begin();
+			return _begin_sentinel;
 		}
 		node *find_recur(const T a, node *n) const {
 			if (comp(a, n->_elem)){
@@ -741,7 +789,6 @@ class map {
 			for (; first != last; first++) insert(*first);
 		}
 	~map() {
-		clear();
 	};
 	map (const map& x) : _comp(x._comp), _alloc(x._alloc) {
 		for (const_iterator first = x.begin(); first != x.end(); first++) {
@@ -749,7 +796,7 @@ class map {
 		}
 	}
 	map& operator= (const map& x) {
-		this->~map();
+		_tree.clear();
 		for (const_iterator i = x.begin(); i != x.end(); i++) {
 			insert(*i);
 		}
@@ -763,10 +810,10 @@ class map {
 	iterator end() {return _tree.end();};
 	const_iterator end() const {return iterator(_tree.end());};
 
-	reverse_iterator rbegin() {return _tree.end() - 1;};
-	const_reverse_iterator rbegin() const {return _tree.end() - 1;};
-	reverse_iterator rend() {return _tree.begin() - 1;};
-	const_reverse_iterator rend() const {return iterator(_tree.begin() - 1);};
+	reverse_iterator rbegin() {return (_tree.rbegin());};
+	const_reverse_iterator rbegin() const {return _tree.rbegin();};
+	reverse_iterator rend() {return _tree.rend();};
+	const_reverse_iterator rend() const {return iterator(_tree.rend());};
 
 	bool empty() const {return !_tree._root;}
 	size_type size() const {
@@ -783,8 +830,8 @@ class map {
 				return retval;
 			}
 		}
-		//std::cout << "it was empty or it didn't exist\n";
-		pair<iterator, bool> retval(_tree.insert(val), true);
+		iterator inserted = _tree.insert(val);
+		pair<iterator, bool> retval(inserted, true);
 		return retval;
 	}
 	iterator insert (iterator position, const value_type& val) {
@@ -847,7 +894,7 @@ class map {
 	 }
 	//https://stackoverflow.com/questions/14187006/is-calling-destructor-manually-always-a-sign-of-bad-design
 	 void clear() {
-		 _tree.~Avltree<value_type, value_compare, Alloc >();
+		 _tree.clear();
 	 }
 	 key_compare key_comp() const {
 		 return _comp;
