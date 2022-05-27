@@ -473,6 +473,31 @@ void check_enable_if() {
 	std::cout << is_odd(b) << "\n";
 }
 
+void rev_it() {
+	vector<int> v1(4);
+	v1[0] = 0;
+	v1[1] = 1;
+	v1[2] = 2;
+	v1[3] = 3;
+	vector<int> v2(4);
+	v2[0] = 4;
+	v2[1] = 5;
+	v2[2] = 6;
+	v2[3] = 7;
+	vector<int>::reverse_iterator ri1 = v1.rbegin();
+	//vector<int>::reverse_iterator ri2 = v2.rbegin();
+	std::cout << (ri1 < v1.rbegin()) << "\n";
+	std::cout << (ri1 <= v1.rbegin()) << "\n";
+	std::cout << (ri1 > v1.rbegin()) << "\n";
+	std::cout << (ri1 >= v1.rbegin()) << "\n";
+	std::cout << (ri1 == v1.rbegin()) << "\n";
+	std::cout << (ri1 != v1.rbegin()) << "\n";
+	std::cout << *(ri1 + 1) << "\n";
+	std::cout << *(v1.rend() - 1) << "\n";
+	std::cout << *(1 + ri1) << "\n";
+	std::cout << (ri1 - v1.rbegin()) << "\n";
+}
+
 void typedefs() {
 #define check_type(a) do {(void)sizeof(vector<int>::a);} while (0)
 	check_type(value_type);
@@ -501,6 +526,7 @@ void test_vector() {
 	non_member();
 	it_traits();
 	check_enable_if();
+	rev_it();
 }
 
 template <class Key, class T>

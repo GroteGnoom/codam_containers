@@ -166,6 +166,14 @@ class rev_ra_iterator : public general_iterator<random_access_iterator_tag, T> {
 		}
 };
 
+#define op(a, b) template <class Iterator> bool operator a (const rev_ra_iterator<Iterator>& lhs, const rev_ra_iterator<Iterator>& rhs) {return lhs.base() b rhs.base();}
+op(<, >)
+op(<=, >=)
+op(>, <)
+op(>=, <=)
+op(==, ==)
+op(!=, !=)
+#undef op
 
 		/*
 template <typename T, typename Distance>
@@ -244,6 +252,11 @@ ra_iterator<T, Distance> operator+(ptrdiff_t a, const ra_iterator<T, Distance> &
 template <typename T>
 rev_ra_iterator<T> operator+(ptrdiff_t a, const rev_ra_iterator<T> &b) {
 	return b + a;
+}
+
+template <typename T>
+ptrdiff_t operator-(const rev_ra_iterator<T> a, const rev_ra_iterator<T> &b) {
+	return b.base() - a.base();
 }
 
 }
