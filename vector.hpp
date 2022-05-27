@@ -5,204 +5,10 @@
 #include <memory> /* allocator */
 #include <iostream>
 #include "iterator.hpp"
+#include "vector_iterator.hpp"
+#include "rest.hpp"
 
 namespace ft {
-
-struct random_access_iterator_tag {};
-
-
-
-template <typename T, typename Distance>
-class ra_iterator : public general_iterator<random_access_iterator_tag, T, Distance> {
-	typedef general_iterator<random_access_iterator_tag, T, Distance> base;
-	private:
-	public:
-		typename base::pointer _pointer;
-		typedef ra_iterator<const T, Distance> const_iter;
-		ra_iterator(const typename base::pointer &p) : _pointer(p) {} //TODO remove?
-		ra_iterator(const ra_iterator &it) : _pointer(it._pointer) {}
-		ra_iterator &operator=(const ra_iterator &it) {
-			_pointer = it._pointer;
-			return *this;
-		}
-		ra_iterator() : _pointer(NULL) {}
-		ra_iterator operator+(Distance a) const {
-			ra_iterator i = *this;
-			i._pointer += a;
-			return i;
-		}
-		ra_iterator &operator+=(Distance a) {
-			_pointer += a;
-			return *this;
-		}
-		ra_iterator &operator-=(Distance a) {
-			_pointer -= a;
-			return *this;
-		}
-		ra_iterator &operator++() {
-			_pointer += 1;
-			return *this;
-		}
-		ra_iterator operator++(int) {
-			ra_iterator tmp = *this;
-			_pointer += 1;
-			return tmp;
-		}
-		ra_iterator &operator--() {
-			_pointer -= 1;
-			return *this;
-		}
-		ra_iterator operator--(int) {
-			ra_iterator tmp = *this;
-			_pointer -= 1;
-			return tmp;
-		}
-		ra_iterator operator-(Distance a) const {
-			ra_iterator i = *this;
-			i._pointer -= a;
-			return i;
-		}
-		T& operator[](size_t idx) {
-			return *(_pointer + idx);
-		}
-		const T& operator[](size_t idx) const {
-			return *(_pointer + idx);
-		}
-		typename base::difference_type operator-(const ra_iterator &rai) const {
-			return _pointer - rai._pointer;
-		}
-		typename base::difference_type operator-(ra_iterator<const T, Distance> &rai) const {
-			return _pointer - rai._pointer;
-		}
-		/*
-		operator ra_iterator< const T, Distance> () const {
-			return (ra_iterator< const T, Distance>(_pointer));
-		}
-		*/
-		operator const_iter () const
-		{
-			return (const_iter(_pointer));
-		}
-
-#define op(a) bool operator a (const const_iter &rai) const { return _pointer a rai._pointer; }
-		op(<)
-		op(>)
-		op(<=)
-		op(>=)
-		op(==)
-		op(!=)
-#undef op
-		T* operator->() const { return _pointer; }
-		T& operator*() const { return *_pointer; }
-};
-
-template <typename T, typename Distance>
-class rev_ra_iterator : public general_iterator<random_access_iterator_tag, T, Distance> {
-	typedef general_iterator<random_access_iterator_tag, T, Distance> base;
-	private:
-	public:
-		typename base::pointer _pointer;
-		rev_ra_iterator(typename base::pointer p) : _pointer(p) {} //TODO remove?
-		rev_ra_iterator() : _pointer(NULL) {}
-		rev_ra_iterator(const rev_ra_iterator &it) : _pointer(it._pointer) {}
-		rev_ra_iterator &operator=(const rev_ra_iterator &it) {
-			_pointer = it._pointer;
-			return *this;
-		}
-		operator rev_ra_iterator< const T, Distance> () const {
-			return (rev_ra_iterator< const T, Distance>(_pointer));
-		}
-		rev_ra_iterator operator+(Distance a) const {
-			rev_ra_iterator i = *this;
-			i._pointer -= a;
-			return i;
-		}
-		rev_ra_iterator &operator+=(Distance a) {
-			_pointer -= a;
-			return *this;
-		}
-		rev_ra_iterator &operator-=(Distance a) {
-			_pointer += a;
-			return *this;
-		}
-		rev_ra_iterator &operator++() {
-			_pointer -= 1;
-			return *this;
-		}
-		rev_ra_iterator operator++(int) {
-			rev_ra_iterator tmp = *this;
-			_pointer -= 1;
-			return tmp;
-		}
-		rev_ra_iterator &operator--() {
-			_pointer += 1;
-			return *this;
-		}
-		rev_ra_iterator operator--(int) {
-			rev_ra_iterator tmp = *this;
-			_pointer += 1;
-			return tmp;
-		}
-		rev_ra_iterator operator-(Distance a) const {
-			rev_ra_iterator i = *this;
-			i._pointer += a;
-			return i;
-		}
-		T& operator[](size_t idx) {
-			return *(_pointer - idx);
-		}
-		const T& operator[](size_t idx) const {
-			return *(_pointer - idx);
-		}
-		typename base::difference_type operator-(rev_ra_iterator<const T, Distance> &rai) const {
-			return rai._pointer - _pointer;
-		}
-		T* operator->() const { return _pointer; }
-		T& operator*() const { return *_pointer; }
-};
-
-template <typename T, typename Distance>
-ra_iterator<T, Distance> operator+(ptrdiff_t a, const ra_iterator<T, Distance> &b) {
-	return b + a;
-}
-
-template <typename T, typename Distance>
-rev_ra_iterator<T, Distance> operator+(ptrdiff_t a, const rev_ra_iterator<T, Distance> &b) {
-	return b + a;
-}
-
-
-#define trait(a) typedef typename Iterator::a a
-template <class Iterator>
-class iterator_traits {
-	public:
-		trait(difference_type);
-		trait(value_type);
-		trait(pointer);
-		trait(reference);
-		trait(iterator_category);
-};
-#undef trait
-
-template <class T>
-class iterator_traits<T*> {
-	public:
-		typedef std::ptrdiff_t difference_type;
-		typedef T value_type;
-		typedef T* pointer;
-		typedef T& reference;
-		typedef random_access_iterator_tag iterator_category;
-};
-
-template <class T>
-class iterator_traits<const T*> {
-	public:
-		typedef std::ptrdiff_t difference_type;
-		typedef T value_type;
-		typedef const T* pointer;
-		typedef const T& reference;
-		typedef random_access_iterator_tag iterator_category;
-};
 
 template <typename T, typename Alloc = std::allocator<T> >
 class vector {
@@ -216,20 +22,17 @@ class vector {
 	typedef size_t size_type;
 	typedef ra_iterator<T, size_type> iterator;
 	typedef ra_iterator<const T, size_type> const_iterator;
-	//typedef const iterator const_iterator; //TODO wrong, right? should be const T, not const iterator
 	typedef rev_ra_iterator<T, size_type> reverse_iterator;
 	typedef rev_ra_iterator<const T, size_type> const_reverse_iterator;
-	typedef ptrdiff_t difference_type; //TODO is it always ptrdiff?
-	//typedef reverse_ra_iterator<T, size_type> reverse_iterator;
+	typedef ptrdiff_t difference_type;
 	private:
 	allocator_type _alloc;
 	size_type _size;
 	size_type _cap;
 	T *_data;
 	public:
-	//typedef reverse_ra_iterator<T, size_type> reverse_iterator;
 	//constructor, destructor, assignment
-	// empty container constructor
+	// default constructor
 	explicit vector (const allocator_type& alloc = allocator_type()) : _alloc(alloc), _size(0), _cap(0), _data(NULL) {};
 
 	//fill constructor
@@ -266,6 +69,7 @@ class vector {
 		}
 	}
 
+	//destructor
 	~vector() {
 		resize(0);
 		if (_size) {
@@ -286,7 +90,8 @@ class vector {
 			_data = _alloc.allocate(v._cap);
 			_cap = v._cap;
 		}
-		//_alloc = v._alloc; //TODO check if this is ok
+		//https://www.cplusplus.com/reference/vector/vector/operator=/
+		//The container preserves its current allocator, which is used to allocate storage in case of reallocation.
 		_size = v._size;
 		for (size_type i = 0; i < _size; i++) {
 			_data[i] = v._data[i];
@@ -321,7 +126,6 @@ class vector {
 		return _data -1;;
 	}
 
-	//TODO: rbegin, rend
 	//Capacity
 
 	size_type size() const {return _size;}
@@ -405,6 +209,7 @@ class vector {
 	//Modifiers
 	//
 
+	//assign range
 	template <class InputIterator>
 		void assign (InputIterator first, InputIterator last) {
 			if (!(first < last) && !(first == last)) {
@@ -416,6 +221,8 @@ class vector {
 				_data[i++] = *first;
 			}
 		}
+
+	//assign fill
 	void assign (size_type n, const value_type& val) {
 		reserve(n);
 		_size = n;
@@ -443,6 +250,7 @@ class vector {
 		resize(_size - 1);
 	}
 
+	//single element
 	iterator insert (iterator position, const value_type& val) {
 		iterator position_copy = position;
 		size_t idx = position - begin();
@@ -456,6 +264,7 @@ class vector {
 		return position_copy;
 	}
 
+	//fill
 	void insert (iterator position, size_type n, const value_type& val) {
 		size_type start = position - begin();
 		resize(_size + n);
@@ -467,6 +276,7 @@ class vector {
 		}
 	}
 
+	//range
 	template <class InputIterator>
 	void insert (iterator position, InputIterator first, InputIterator last) {
 		size_type start = position - begin();
@@ -480,6 +290,7 @@ class vector {
 		}
 	}
 
+	//single
 	iterator erase (iterator position) {
 		iterator position_copy = position;
 		_size --;
@@ -489,6 +300,7 @@ class vector {
 		return position_copy;
 	}
 
+	//range
 	iterator erase (iterator first, iterator last) {
 		for (;last < end(); last++) {
 			*first = *last;
@@ -504,58 +316,16 @@ class vector {
 		std::swap(_data, x._data);
 	}
 	void clear() {
-		for (size_type i = 0; i < _size; i++) {
-			_data[i].~T();
-		}
-		_size = 0;
+		resize(0);
 	}
+
+	//Allocator
 	allocator_type get_allocator() const {
 		return _alloc;
 	}
 };
 
-template <typename it1, typename it2>
-bool lexicographical_compare(it1 b1, it1 e1, it2 b2, it2 e2) {
-	while (true) {
-		if (b1 >= e1 && b2 >= e2)
-			return false;
-		if (b1 >= e1)
-			return true;
-		if (b2 >= e2)
-			return false;
-		if (*b1 < *b2)
-			return true;
-		if (*b1 > *b2)
-			return false;
-		b1++;
-		b2++;
-	}
-}
-
-template <typename it1, typename it2>
-bool equal(it1 b1, it1 e1, it2 b2) {
-	while (b1 != e1) {
-		if (*b1 != *b2)
-			return false;
-		b1++;
-		b2++;
-	}
-	return true;
-}
-
-template <class InputIterator1, class InputIterator2, class BinaryPredicate>
-bool equal (InputIterator1 b1, InputIterator1 e1,
-		InputIterator2 b2, BinaryPredicate pred) {
-	while (true) {
-		if (b1 >= e1)
-			return true;
-		if (!pred(*b1, *b2))
-			return false;
-		b1++;
-		b2++;
-	}
-}
-
+//relational operators
 template <class T, class Alloc>
 bool operator== (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs) {
 	if (lhs.size() != rhs.size())
@@ -588,17 +358,11 @@ bool operator>= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs) {
 	return lhs > rhs || lhs == rhs;
 }
 
+//swap
 template <class T, class Alloc>
 void swap (vector<T,Alloc>& x, vector<T,Alloc>& y) {
 	x.swap(y);
 }
-
-// this makes a templated struct. so enable_if<Cond, T>
-template<bool Cond, class T = void> struct enable_if {};
-
-//This one only matches if Cond is trye. That means type will get typedefd to T, so you have to put the enable_if::type in place of your normal type
-// if the condition is not true the typedef will not happen, and the compler will look for other functions
-template<class T> struct enable_if<true, T> { typedef T type; };
 
 } //namespace ft
 #endif

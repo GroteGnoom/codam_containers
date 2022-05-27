@@ -8,7 +8,7 @@ ifdef DEBUG
 	FLAGS = -Wall -Wextra -fsanitize=address -DDEBUG=1 -g -std=c++98 -pedantic -Wshadow -ferror-limit=1000
 else
 	CC=c++
-	FLAGS = -Wall -Wextra -Werror
+	FLAGS = -Wall -Wextra -Werror -O3
 endif
 
 ifdef STD
@@ -38,6 +38,9 @@ test:
 	$(MAKE) -C ext #TODO remove
 	#$(MAKE) re DEBUG=1 SRC=test_avl.cpp NAME=test_avl
 	#./test_avl
+
+fast:
+	$(MAKE) -C ext #TODO remove
 
 clean:
 	rm -f $(OBJ)

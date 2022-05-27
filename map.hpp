@@ -506,10 +506,7 @@ class Avltree {
 		~Avltree() {
 			_begin_sentinel->del();
 			_end_sentinel->del();
-			if (!_root) return;
-			_root->del_children();
-			_root->del();
-			_root = NULL;
+			clear();
 		}
 		void clear() {
 			if (!_root) return;
