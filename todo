@@ -31,6 +31,12 @@ vector:
 	iterators
 	capacity
 	element access
+	modifiers
+	allocator
+	non-member function overloads
+	not too much public
+	todo: iterator
+	todo: reverse_iterator
 
 
 

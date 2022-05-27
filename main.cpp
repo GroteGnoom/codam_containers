@@ -176,8 +176,28 @@ static void iter() {
 		vector<int> v;
 		v.push_back(1);
 		v.push_back(2);
+		v.push_back(3);
+		v.push_back(4);
+		v.push_back(5);
 		vector<int>::const_iterator it = v.begin();
-		(void) it;
+		vector<int>::const_iterator it2 = v.end();
+		it++;
+		std::cout << *(++it) << "\n";
+		std::cout << *(--it) << "\n";
+		std::cout << *(it++) << "\n";
+		std::cout << *(it--) << "\n";
+		std::cout << *it++ << "\n";
+		std::cout << *it-- << "\n";
+
+		std::cout << *(it+1) << "\n";
+		std::cout << *(1+it) << "\n";
+		std::cout << *(it-1) << "\n";
+		std::cout << it2-it << "\n";
+
+		std::cout << (it < it2) << "\n";
+		std::cout << (it > it2) << "\n";
+		std::cout << (it <= it2) << "\n";
+		std::cout << (it >= it2) << "\n";
 	}
 }
 

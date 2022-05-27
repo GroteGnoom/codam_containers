@@ -1,37 +1,36 @@
 #ifndef VECTOR_ITERATOR_HPP
 #define VECTOR_ITERATOR_HPP
 
+
 namespace ft {
 
 struct random_access_iterator_tag {};
 
 template <typename T, typename Distance>
 class ra_iterator : public general_iterator<random_access_iterator_tag, T, Distance> {
+#define op(a) bool operator a (const const_iter &rai) const { return _pointer a rai._pointer; }
 	typedef general_iterator<random_access_iterator_tag, T, Distance> base;
 	private:
+		typedef ra_iterator<const T, Distance> const_iter;
 	public:
 		typename base::pointer _pointer;
-		typedef ra_iterator<const T, Distance> const_iter;
-		ra_iterator(const typename base::pointer &p) : _pointer(p) {}
+		//coplien
+		ra_iterator() : _pointer(NULL) {} //TODO remove
+		ra_iterator(typename base::pointer pointer) : _pointer(pointer) {}
 		ra_iterator(const ra_iterator &it) : _pointer(it._pointer) {}
 		ra_iterator &operator=(const ra_iterator &it) {
 			_pointer = it._pointer;
 			return *this;
 		}
-		ra_iterator() : _pointer(NULL) {}
-		ra_iterator operator+(Distance a) const {
-			ra_iterator i = *this;
-			i._pointer += a;
-			return i;
-		}
-		ra_iterator &operator+=(Distance a) {
-			_pointer += a;
-			return *this;
-		}
-		ra_iterator &operator-=(Distance a) {
-			_pointer -= a;
-			return *this;
-		}
+		//equivalence
+		op(==)
+		op(!=)
+		
+		//dereference
+		T* operator->() const { return _pointer; }
+		T& operator*() const { return *_pointer; }
+
+		//increment
 		ra_iterator &operator++() {
 			_pointer += 1;
 			return *this;
@@ -41,6 +40,8 @@ class ra_iterator : public general_iterator<random_access_iterator_tag, T, Dista
 			_pointer += 1;
 			return tmp;
 		}
+
+		//decrement
 		ra_iterator &operator--() {
 			_pointer -= 1;
 			return *this;
@@ -50,10 +51,30 @@ class ra_iterator : public general_iterator<random_access_iterator_tag, T, Dista
 			_pointer -= 1;
 			return tmp;
 		}
+
+		//arithmetic
+		ra_iterator operator+(Distance a) const {
+			ra_iterator i = *this;
+			i._pointer += a;
+			return i;
+		}
+		// reverse addition is outside of class
 		ra_iterator operator-(Distance a) const {
 			ra_iterator i = *this;
 			i._pointer -= a;
 			return i;
+		}
+		// reverse subtraction is outside of class
+
+		//compound assignment
+		ra_iterator &operator+=(Distance a) {
+			_pointer += a;
+			return *this;
+		}
+
+		ra_iterator &operator-=(Distance a) {
+			_pointer -= a;
+			return *this;
 		}
 		T& operator[](size_t idx) {
 			return *(_pointer + idx);
@@ -72,16 +93,11 @@ class ra_iterator : public general_iterator<random_access_iterator_tag, T, Dista
 			return (const_iter(_pointer));
 		}
 
-#define op(a) bool operator a (const const_iter &rai) const { return _pointer a rai._pointer; }
 		op(<)
 		op(>)
 		op(<=)
 		op(>=)
-		op(==)
-		op(!=)
 #undef op
-		T* operator->() const { return _pointer; }
-		T& operator*() const { return *_pointer; }
 };
 
 template <typename T, typename Distance>
