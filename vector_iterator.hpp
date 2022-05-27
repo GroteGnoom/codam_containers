@@ -6,17 +6,17 @@ namespace ft {
 
 struct random_access_iterator_tag {};
 
+/*
 template <typename T, typename Distance>
 class ra_iterator : public general_iterator<random_access_iterator_tag, T, Distance> {
 #define op(a) bool operator a (const const_iter &rai) const { return _pointer a rai._pointer; }
 	typedef general_iterator<random_access_iterator_tag, T, Distance> base;
 	private:
 		typedef ra_iterator<const T, Distance> const_iter;
-	public:
 		typename base::pointer _pointer;
+	public:
 		//coplien
-		ra_iterator() : _pointer(NULL) {} //TODO remove
-		ra_iterator(typename base::pointer pointer) : _pointer(pointer) {}
+		ra_iterator() : _pointer(NULL) {}
 		ra_iterator(const ra_iterator &it) : _pointer(it._pointer) {}
 		ra_iterator &operator=(const ra_iterator &it) {
 			_pointer = it._pointer;
@@ -99,7 +99,75 @@ class ra_iterator : public general_iterator<random_access_iterator_tag, T, Dista
 		op(>=)
 #undef op
 };
+*/
 
+template <typename T>
+class rev_ra_iterator : public general_iterator<random_access_iterator_tag, T> {
+		T* _base;
+		typedef rev_ra_iterator<const T> const_rev_ra_iterator;
+		typedef ptrdiff_t Distance;
+	public:
+		//default constructor
+		rev_ra_iterator() : _base() {}
+
+		//https://cplusplus.com/reference/iterator/reverse_iterator/reverse_iterator/
+		explicit rev_ra_iterator(T* it) : _base(&(*it)) {};
+
+		template <class Iter>
+		rev_ra_iterator(const rev_ra_iterator<Iter> &it) : _base(it.base()) {}
+		rev_ra_iterator &operator=(const rev_ra_iterator &it) {
+			_base = it._base;
+			return *this;
+		}
+		~rev_ra_iterator() {}
+		T* base() const {return _base;}
+		T& operator*() const { return *_base; }
+		rev_ra_iterator operator+(Distance a) const {
+			return rev_ra_iterator(_base - a);
+		}
+		rev_ra_iterator &operator++() {
+			_base -= 1;
+			return *this;
+		}
+		rev_ra_iterator operator++(int) {
+			return rev_ra_iterator(_base--);
+		}
+		rev_ra_iterator &operator+=(Distance a) {
+			_base -= a;
+			return *this;
+		}
+		rev_ra_iterator operator-(Distance a) const {
+			return rev_ra_iterator(_base + a);
+		}
+		rev_ra_iterator &operator--() {
+			_base += 1;
+			return *this;
+		}
+		rev_ra_iterator operator--(int) {
+			return rev_ra_iterator(_base++);
+		}
+		rev_ra_iterator &operator-=(Distance a) {
+			_base += a;
+			return *this;
+		}
+		Distance operator-(const const_rev_ra_iterator &a) const {
+			return a.base() - _base;
+		}
+		T* operator->() const { return _base; }
+		T& operator[](size_t idx) {
+			return *(_base - idx);
+		}
+		const T& operator[](size_t idx) const {
+			return *(_base - idx);
+		}
+		operator const_rev_ra_iterator () const
+		{
+			return (const_rev_ra_iterator(_base));
+		}
+};
+
+
+		/*
 template <typename T, typename Distance>
 class rev_ra_iterator : public general_iterator<random_access_iterator_tag, T, Distance> {
 	typedef general_iterator<random_access_iterator_tag, T, Distance> base;
@@ -164,14 +232,17 @@ class rev_ra_iterator : public general_iterator<random_access_iterator_tag, T, D
 		T* operator->() const { return _pointer; }
 		T& operator*() const { return *_pointer; }
 };
+*/
 
+/*
 template <typename T, typename Distance>
 ra_iterator<T, Distance> operator+(ptrdiff_t a, const ra_iterator<T, Distance> &b) {
 	return b + a;
 }
+*/
 
-template <typename T, typename Distance>
-rev_ra_iterator<T, Distance> operator+(ptrdiff_t a, const rev_ra_iterator<T, Distance> &b) {
+template <typename T>
+rev_ra_iterator<T> operator+(ptrdiff_t a, const rev_ra_iterator<T> &b) {
 	return b + a;
 }
 

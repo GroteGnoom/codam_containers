@@ -38,6 +38,8 @@ vector:
 	todo: iterator
 	todo: reverse_iterator
 
+functions like advance?
+https://m.cplusplus.com/reference/iterator/
 
 
 done:

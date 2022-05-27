@@ -5,7 +5,6 @@
 #include <memory> /* allocator */
 #include <iostream>
 #include "iterator.hpp"
-#include "vector_iterator.hpp"
 #include "rest.hpp"
 
 namespace ft {
@@ -20,20 +19,22 @@ class vector {
 	typedef T* pointer;
 	typedef const T* const_pointer;
 	typedef size_t size_type;
-	typedef ra_iterator<T, size_type> iterator;
-	typedef ra_iterator<const T, size_type> const_iterator;
-	typedef rev_ra_iterator<T, size_type> reverse_iterator;
-	typedef rev_ra_iterator<const T, size_type> const_reverse_iterator;
+	//typedef ra_iterator<T, size_type> iterator;
+	//typedef ra_iterator<const T, size_type> const_iterator;
+	typedef T* iterator;
+	typedef const T* const_iterator;
+	typedef rev_ra_iterator<T> reverse_iterator;
+	typedef rev_ra_iterator<const T> const_reverse_iterator;
 	typedef ptrdiff_t difference_type;
 	private:
 	allocator_type _alloc;
 	size_type _size;
 	size_type _cap;
-	T *_data;
+	iterator _data;
 	public:
 	//constructor, destructor, assignment
 	// default constructor
-	explicit vector (const allocator_type& alloc = allocator_type()) : _alloc(alloc), _size(0), _cap(0), _data(NULL) {};
+	explicit vector (const allocator_type& alloc = allocator_type()) : _alloc(alloc), _size(0), _cap(0), _data() {};
 
 	//fill constructor
 	explicit vector (size_type n, const T& val = T(), const allocator_type& alloc = allocator_type()) : _alloc(alloc), _size(n), _cap(n), _data(_alloc.allocate(n)) {
@@ -43,7 +44,7 @@ class vector {
 	}
 
 	//range constructor
-	vector (ra_iterator<T, size_type> first, ra_iterator<T, size_type> last, const allocator_type& alloc = allocator_type()) :
+	vector (iterator first, iterator last, const allocator_type& alloc = allocator_type()) :
 		_alloc(alloc), _size(last - first), _cap(_size) {
 			if (first < last) {
 				_data = _alloc.allocate(_cap);
@@ -120,10 +121,10 @@ class vector {
 		return begin() + _size;
 	}
 	reverse_iterator rend() {
-		return _data -1;
+		return reverse_iterator(_data -1);
 	}
 	const_reverse_iterator rend() const {
-		return _data -1;;
+		return const_reverse_iterator(_data -1);
 	}
 
 	//Capacity
