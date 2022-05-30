@@ -19,16 +19,14 @@ struct Avlnode {
 	Avlnode *_end_sentinel;
 	Avlnode(T elem, Avlnode *parent, Avlnode *begin_sentinel, Avlnode *end_sentinel) : _elem(elem), _left(NULL), _right(NULL), _parent(parent), _begin_sentinel(begin_sentinel), _end_sentinel(end_sentinel) {}
 	Avlnode(Avlnode *root, Avlnode *begin_sentinel, Avlnode *end_sentinel) : _elem(T()), _left(NULL), _right(NULL), _parent(root), _begin_sentinel(begin_sentinel), _end_sentinel(end_sentinel) {}
-	Compare comp;
 	typename Alloc::template rebind<Avlnode>::other node_alloc;
-	Avlnode(const Avlnode &a) : _elem(a._elem), _left(a._left), _right(a._right), _parent(a._parent), _begin_sentinel(a._begin_sentinel), _end_sentinel(a._end_sentinel), comp(a.comp)  {
+	Avlnode(const Avlnode &a) : _elem(a._elem), _left(a._left), _right(a._right), _parent(a._parent), _begin_sentinel(a._begin_sentinel), _end_sentinel(a._end_sentinel) {
 	}
 	Avlnode &operator=(const Avlnode &a) {
 		_elem = a._elem;
 		_left = a._left;
 		_right = a._right;
 		_parent = a._parent;
-		comp = a.comp;
 		return *this;
 	}
 	int get_height() const {
@@ -305,8 +303,7 @@ class map {
 	typedef Compare key_compare;
 	class value_compare : std::binary_function<value_type, value_type, bool> {
 		friend class map;
-		//protected: //TODO should it be protected?
-		public:
+		protected:
 		Compare comp;
 		value_compare (Compare c = Compare()) : comp(c) {}
 		public:
