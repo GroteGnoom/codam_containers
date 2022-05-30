@@ -544,6 +544,111 @@ void print_elems(map<std::string, int> &m) {
 		std::cout << first->first << " " << first->second << "\n";
 	}
 }
+
+static void test_map_constructors() {
+	std::cout << "Constructors:\n";
+	std::cout << "default constructor:\n";
+	map<std::string, int> m;
+	m["a"] = 100;
+	m["b"] = 11;
+	std::cout << "copy constructor:\n";
+	map<std::string, int> m2 = m;
+	m2["d"] = 4;
+	m2["c"] = 5;
+	print_elems(m);
+	print_elems(m2);
+}
+
+static void test_map_capacity() {
+	map<std::string, int> m;
+
+	std::cout << "Capacity\n";
+	std::cout << "Is empty map empty? " << m.empty() << "\n";
+	std::cout << "What is its size?" << m.size() << "\n";
+	pair<map<std::string, int>::iterator, bool> a = m.insert(pair<std::string, int>("hoi", 5));
+	std::cout << "Is non-empty map empty? " << m.empty() << "\n";
+	std::cout << "What is its size?" << m.size() << "\n";
+	std::cout << "What the dereferenced iterator key? " << (*(a.first)).first << "\n";
+	std::cout << "What the dereferenced iterator key via ->? " << a.first->first << "\n";
+	std::cout << "What the dereferenced iterator value? " << (*(a.first)).second << "\n";
+	std::cout << "What the dereferenced iterator value via ->? " << a.first->second << "\n";
+	a = m.insert(pair<std::string, int>("hoi", 10));
+	std::cout << "Try to add the same key, should do nothing, so same key has same value: " << a.first->second << "\n";
+	//std::cout << "What is the max size?" << m.max_size() << "\n"; //TODO check by hand? They don't have to be the same. Maybe nodes will be bigger with more state to make things quicker
+	a = m.insert(pair<std::string, int>("banaan", 20));
+	std::cout << "Try to add different key: " << a.first->second << "\n";
+}
+
+static void test_map_element_access() {
+	map<std::string, int> m;
+	//Element access
+	m["aa"] = 10;
+	std::cout << "add aa = 10, aa is " << m["aa"] << "\n";
+	m["a"] = 20;
+	std::cout << "add a = 20, a is " << m["a"] << "\n";
+	std::cout << "aa a is " << m["aa"] << "\n";
+	std::cout << "bb is " << m["bb"] << "\n"; //TODO leaks
+	std::cout << "bb is " << m["bb"] << "\n"; //TODO leaks
+	std::cout << "bb is " << m["bb"] << "\n"; //TODO leaks
+
+	std::cout << "What is its size? " << m.size() << "\n";
+	m.erase("a");
+	std::cout << "after erasing a is " << m["a"] << "\n";
+	std::cout << "What is its size? " << m.size() << "\n";
+}
+
+static void test_map_modifiers() {
+	map<std::string, int> m;
+	m.insert(pair<std::string, int>("hoi", 10));
+	//modifiers
+	//
+	//insert is already tested
+	map<std::string, int>::iterator it;
+	it = m.find("hoi");
+	std::cout << "is find equal to end? " << (it == m.end()) << "\n";
+	std::cout << "erase element\n";
+	m.erase("hoi");
+	std::cout << "What is its size?" << m.size() << "\n";
+	it = m.find("hoi");
+	std::cout << "is find equal to end? " << (it == m.end()) << "\n";
+
+
+	map<std::string, int> m2;
+
+	m2["asdfa"] = 12;
+	std::cout << "What is the size of a new tree" << m.size() << "\n";
+	m.swap(m2);
+	std::cout << "What is the size old tree after swap" << m.size() << "\n";
+	std::cout << "What is the size the new tree after swap" << m2.size() << "\n";
+	m.clear();
+	std::cout << "What is the size old tree after clear" << m.size() << "\n";
+
+	map<std::string, int>::key_compare kc = m.key_comp();
+	std::cout << "compare a and b:" << kc("a", "b") << "\n";
+
+	map<std::string, int>::value_compare vc = m.value_comp();
+
+	map<std::string, int>::value_type v1;
+	map<std::string, int>::value_type v2;
+	std::cout << "compare with value type:" << vc(v1, v2) << "\n";
+
+
+	std::cout << "count aa: " << m2.count("aa") << "\n";
+	std::cout << "count cc: " << m2.count("cc") << "\n";
+
+	std::cout << "lower bound a: " << it_to_key(m2.lower_bound("a"), m2) << "\n";
+	std::cout << "lower bound b: " << it_to_key(m2.lower_bound("b"), m2) << "\n";
+	std::cout << "lower bound c: " << it_to_key(m2.lower_bound("c"), m2) << "\n";
+
+	std::cout << "upper bound a: " << it_to_key(m2.upper_bound("a"), m2) << "\n";
+	std::cout << "upper bound b: " << it_to_key(m2.upper_bound("b"), m2) << "\n";
+	std::cout << "upper bound c: " << it_to_key(m2.upper_bound("c"), m2) << "\n";
+
+	std::cout << "range a: " << it_to_key(m2.equal_range("a").first, m2) << " " << it_to_key(m2.equal_range("a").second, m2) << "\n";
+	std::cout << "range b: " << it_to_key(m2.equal_range("b").first, m2) << " " << it_to_key(m2.equal_range("b").second, m2) << "\n";
+	std::cout << "range c: " << it_to_key(m2.equal_range("c").first, m2) << " " << it_to_key(m2.equal_range("c").second, m2) << "\n";
+}
+
 void test_map() {
 #define check_type(a) do {(void)sizeof(map<std::string, int>::a);} while (0)
 	check_type(key_type);
@@ -558,105 +663,16 @@ void test_map() {
 	check_type(const_pointer);
 	check_type(iterator);
 	check_type(const_iterator);
-	// TODO check_type(reverse_iterator);
-	// TODO check_type(const_reverse_iterator);
+	check_type(reverse_iterator);
+	check_type(const_reverse_iterator);
 	check_type(difference_type);
 	check_type(size_type);
 #undef check_type
-	{
-		std::cout << "Constructors:\n";
-		std::cout << "default constructor:\n";
-		map<std::string, int> m;
-		m["a"] = 100;
-		m["b"] = 11;
-		std::cout << "copy constructor:\n";
-		map<std::string, int> m2 = m;
-		m2["d"] = 4;
-		m2["c"] = 5;
-		print_elems(m);
-		print_elems(m2);
-	}
-	{
-		map<std::string, int> m;
+	test_map_constructors();
+	test_map_capacity();
+	test_map_element_access();
+	test_map_modifiers();
 
-		std::cout << "Capacity\n";
-		std::cout << "Is empty map empty? " << m.empty() << "\n";
-		std::cout << "What is its size?" << m.size() << "\n";
-		pair<map<std::string, int>::iterator, bool> a = m.insert(pair<std::string, int>("hoi", 5));
-		std::cout << "Is non-empty map empty? " << m.empty() << "\n";
-		std::cout << "What is its size?" << m.size() << "\n";
-		std::cout << "What the dereferenced iterator key? " << (*(a.first)).first << "\n";
-		std::cout << "What the dereferenced iterator key via ->? " << a.first->first << "\n";
-		std::cout << "What the dereferenced iterator value? " << (*(a.first)).second << "\n";
-		std::cout << "What the dereferenced iterator value via ->? " << a.first->second << "\n";
-		a = m.insert(pair<std::string, int>("hoi", 10));
-		std::cout << "Try to add the same key, should do nothing, so same key has same value: " << a.first->second << "\n";
-		//std::cout << "What is the max size?" << m.max_size() << "\n"; //TODO check by hand? They don't have to be the same. Maybe nodes will be bigger with more state to make things quicker
-		a = m.insert(pair<std::string, int>("banaan", 20));
-		std::cout << "Try to add different key: " << a.first->second << "\n";
-
-		//Element access
-		m["aa"] = 10;
-		std::cout << "add aa = 10, aa is " << m["aa"] << "\n";
-		m["a"] = 20;
-		std::cout << "add a = 20, a is " << m["a"] << "\n";
-		std::cout << "aa a is " << m["aa"] << "\n";
-		std::cout << "bb is " << m["bb"] << "\n"; //TODO leaks
-		std::cout << "bb is " << m["bb"] << "\n"; //TODO leaks
-		std::cout << "bb is " << m["bb"] << "\n"; //TODO leaks
-
-		std::cout << "What is its size? " << m.size() << "\n";
-		m.erase("a");
-		std::cout << "after erasing a is " << m["a"] << "\n";
-		std::cout << "What is its size? " << m.size() << "\n";
-		//modifiers
-		//
-		//insert is already tested
-		map<std::string, int>::iterator it;
-		it = m.find("hoi");
-		std::cout << "is find equal to end? " << (it == m.end()) << "\n";
-		std::cout << "erase element\n";
-		m.erase("hoi");
-		std::cout << "What is its size?" << m.size() << "\n";
-		it = m.find("hoi");
-		std::cout << "is find equal to end? " << (it == m.end()) << "\n";
-
-
-		map<std::string, int> m2;
-
-		m2["asdfa"] = 12;
-		std::cout << "What is the size of a new tree" << m.size() << "\n";
-		m.swap(m2);
-		std::cout << "What is the size old tree after swap" << m.size() << "\n";
-		std::cout << "What is the size the new tree after swap" << m2.size() << "\n";
-		m.clear();
-		std::cout << "What is the size old tree after clear" << m.size() << "\n";
-
-		map<std::string, int>::key_compare kc = m.key_comp();
-		std::cout << "compare a and b:" << kc("a", "b") << "\n";
-
-		map<std::string, int>::value_compare vc = m.value_comp();
-
-		map<std::string, int>::value_type v1;
-		map<std::string, int>::value_type v2;
-		std::cout << "compare with value type:" << vc(v1, v2) << "\n";
-
-
-		std::cout << "count aa: " << m2.count("aa") << "\n";
-		std::cout << "count cc: " << m2.count("cc") << "\n";
-
-		std::cout << "lower bound a: " << it_to_key(m2.lower_bound("a"), m2) << "\n";
-		std::cout << "lower bound b: " << it_to_key(m2.lower_bound("b"), m2) << "\n";
-		std::cout << "lower bound c: " << it_to_key(m2.lower_bound("c"), m2) << "\n";
-
-		std::cout << "upper bound a: " << it_to_key(m2.upper_bound("a"), m2) << "\n";
-		std::cout << "upper bound b: " << it_to_key(m2.upper_bound("b"), m2) << "\n";
-		std::cout << "upper bound c: " << it_to_key(m2.upper_bound("c"), m2) << "\n";
-		
-		std::cout << "range a: " << it_to_key(m2.equal_range("a").first, m2) << " " << it_to_key(m2.equal_range("a").second, m2) << "\n";
-		std::cout << "range b: " << it_to_key(m2.equal_range("b").first, m2) << " " << it_to_key(m2.equal_range("b").second, m2) << "\n";
-		std::cout << "range c: " << it_to_key(m2.equal_range("c").first, m2) << " " << it_to_key(m2.equal_range("c").second, m2) << "\n";
-	}
 }
 
 void test_pair() {

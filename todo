@@ -35,8 +35,10 @@ vector:
 	allocator
 	non-member function overloads
 	not too much public
-	todo: iterator
-	todo: reverse_iterator
+	iterator
+	reverse_iterator
+
+map:
 
 functions like advance?
 https://m.cplusplus.com/reference/iterator/

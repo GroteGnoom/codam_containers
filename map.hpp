@@ -18,16 +18,25 @@ class node_iterator : public general_iterator<bidirectional_iterator_tag, Avlnod
 	private:
 	typename base::pointer _pointer;
 	public:
-	node_iterator(typename base::pointer p) : _pointer(p) {
-	}
-	node_iterator() : _pointer(NULL) {
-	}
+	//Constructors 
+	node_iterator(typename base::pointer p) : _pointer(p) {}
+	node_iterator() : _pointer(NULL) {}
 	node_iterator &operator=(const node_iterator &it) {
 		_pointer = it._pointer;
 		return *this;
 	}
+	//Destructor 
+	~node_iterator() {}
+
+	//Comparison
 	bool operator == (const node_iterator &nodei) const { return _pointer == nodei._pointer; }
 	bool operator != (const node_iterator &nodei) const { return _pointer != nodei._pointer; }
+
+	//Dereference
+	//https://stackoverflow.com/questions/21569483/c-overloading-dereference-operators
+	T* operator->() const { return &(_pointer->_elem); }
+	T& operator*() const { return _pointer->_elem; }
+
 	//TODO operations
 	node_iterator &operator++() {
 		_pointer = _pointer->next();
@@ -47,10 +56,6 @@ class node_iterator : public general_iterator<bidirectional_iterator_tag, Avlnod
 		_pointer = _pointer->previous();
 		return tmp;
 	}
-
-	//https://stackoverflow.com/questions/21569483/c-overloading-dereference-operators
-	T* operator->() const { return &(_pointer->_elem); }
-	T& operator*() const { return _pointer->_elem; }
 
 	/*implicit conversion!*/
 	operator node_iterator< T, Compare, Alloc, const T*, const T&> () const {
