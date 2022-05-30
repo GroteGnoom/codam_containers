@@ -9,7 +9,7 @@ struct bidirectional_iterator_tag {};
 template <class T, class Alloc>
 struct Avlnode;
 
-template <typename T, class Compare, class Alloc, class Pointer = T*, class Reference = T& >
+template <typename T, class Alloc, class Pointer = T*, class Reference = T& >
 class node_iterator : public general_iterator<bidirectional_iterator_tag, Avlnode<T, Alloc> > {
 	typedef general_iterator<bidirectional_iterator_tag, Avlnode<T, Alloc> > base_type;
 	private:
@@ -60,25 +60,25 @@ class node_iterator : public general_iterator<bidirectional_iterator_tag, Avlnod
 	}
 
 	/*implicit conversion*/
-	operator node_iterator< T, Compare, Alloc, const T*, const T&> () const {
-		return (node_iterator< T, Compare, Alloc, const T*, const T&>(_pointer));
+	operator node_iterator< T, Alloc, const T*, const T&> () const {
+		return (node_iterator< T, Alloc, const T*, const T&>(_pointer));
 	}
 };
 
 //https://www.cplusplus.com/reference/iterator/reverse_iterator/
-template <typename T, class Compare, class Alloc, class Pointer = T*, class Reference = T& >
+template <typename T, class Alloc, class Pointer = T*, class Reference = T& >
 class rev_node_iterator : public general_iterator<bidirectional_iterator_tag, Avlnode<T, Alloc> > {
 	typedef general_iterator<bidirectional_iterator_tag, Avlnode<T, Alloc> > base_type;
 	private:
-	node_iterator<T, Compare, Alloc> _base;
+	node_iterator<T, Alloc> _base;
 	public:
 	//constructors
 	rev_node_iterator(typename base_type::pointer p) : _base(p) { }
 	rev_node_iterator() : _base(NULL) { }
-	rev_node_iterator(node_iterator<T, Compare, Alloc> b) : _base(b) { }
+	rev_node_iterator(node_iterator<T, Alloc> b) : _base(b) { }
 	// copy constructor
 	template <class E>
-	rev_node_iterator(const rev_node_iterator<E, Compare, Alloc> &it) : _base(it.base()) {}
+	rev_node_iterator(const rev_node_iterator<E, Alloc> &it) : _base(it.base()) {}
 	//copy assignment
 	rev_node_iterator &operator=(const rev_node_iterator &it) {
 		_base = it._base;
@@ -121,8 +121,8 @@ class rev_node_iterator : public general_iterator<bidirectional_iterator_tag, Av
 	}
 
 	/*implicit conversion!*/
-	operator rev_node_iterator< T, Compare, Alloc, const T*, const T&> () const {
-		return (rev_node_iterator< T, Compare, Alloc, const T*, const T&>(_base));
+	operator rev_node_iterator< T, Alloc, const T*, const T&> () const {
+		return (rev_node_iterator< T, Alloc, const T*, const T&>(_base));
 	}
 };
 

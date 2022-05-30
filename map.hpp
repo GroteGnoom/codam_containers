@@ -324,10 +324,10 @@ class map {
 	typedef typename allocator_type::const_pointer const_pointer;
 	typedef std::ptrdiff_t difference_type;
 	typedef size_t size_type;
-	typedef node_iterator<value_type, value_compare, Alloc> iterator;
-	typedef node_iterator<value_type, value_compare, Alloc, const value_type *, const value_type &> const_iterator;
-	typedef rev_node_iterator<value_type, value_compare, Alloc> reverse_iterator;
-	typedef rev_node_iterator<value_type, value_compare, Alloc, const value_type *, const value_type &> const_reverse_iterator;
+	typedef node_iterator<value_type, Alloc> iterator;
+	typedef node_iterator<value_type, Alloc, const value_type *, const value_type &> const_iterator;
+	typedef rev_node_iterator<value_type, Alloc> reverse_iterator;
+	typedef rev_node_iterator<value_type, Alloc, const value_type *, const value_type &> const_reverse_iterator;
 	private:
 	key_compare _comp;
 	allocator_type _alloc;
