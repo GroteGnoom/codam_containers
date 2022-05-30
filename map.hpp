@@ -291,245 +291,6 @@ struct Avlnode {
 	}
 };
 
-template <class T, class Compare, class Alloc>
-class Avltree {
-	typedef Avlnode<T, Compare, Alloc> node;
-	typedef Avlnode<const T, Compare, Alloc> const_node;
-	typename Alloc::template rebind<node>::other node_alloc;
-	public:
-		node *_begin_sentinel;
-		node *_end_sentinel;
-		node *newroot(T elem ) {
-			node *np = node_alloc.allocate(1);
-			node n(elem, NULL, _begin_sentinel, _end_sentinel);
-			node_alloc.construct(np, n);
-			_begin_sentinel->_parent = np;
-			_end_sentinel->_parent = np;
-			return np;
-		}
-		node *newsentinel(T elem ) {
-			node *np = node_alloc.allocate(1);
-			node n(elem, NULL, NULL, NULL);
-			node_alloc.construct(np, n);
-			return np;
-		}
-		Compare comp;
-		Avlnode<T, Compare, Alloc> *_root;
-		Avltree() : _root(NULL) {
-			_begin_sentinel = newsentinel(T());
-			_end_sentinel = newsentinel(T());
-			_begin_sentinel->_begin_sentinel = _begin_sentinel;
-			_begin_sentinel->_end_sentinel = _end_sentinel;
-			_end_sentinel->_begin_sentinel = _begin_sentinel;
-			_end_sentinel->_end_sentinel = _end_sentinel;
-		}
-		node* insert(T elem) {
-			if (!_root) {
-				_root = newroot(elem);
-				return _root;
-			}
-			node *current = _root;
-			while (true) {
-				if (Compare()(elem, current->_elem)) {
-					if (current->_left) {
-						current = current->_left;
-					}
-					else {
-						current->_left = current->newnode(elem);
-						current = current->_left;
-						break;
-					}
-				} else {
-					if (current->_right) {
-						current = current->_right;
-					}
-					else {
-						current->_right = current->newnode(elem);
-						current = current->_right;
-						break;
-					}
-				}
-			}
-			reroot();
-			rebalance(current);
-			reroot();
-			return current;
-		}
-		~Avltree() {
-			_begin_sentinel->del();
-			_end_sentinel->del();
-			clear();
-		}
-		void clear() {
-			if (!_root) return;
-			_root->del_children();
-			_root->del();
-			_root = NULL;
-		}
-		node *begin() const {
-			if (!_root) return NULL;
-			node *search = _root;
-			while (search->_left) {
-				search = search->_left;
-			}
-			return search;
-		}
-		node *end() const {
-			/*
-			if (!_root) return begin();
-			node *search = _root;
-
-			while (search->_right) {
-				search = search->_right;
-			}
-			return search + 1;
-			*/
-			if (!_root) return begin();
-			return _end_sentinel;
-		}
-		node *rbegin() const {
-			if (!_root) return begin();
-			node *search = _root;
-			while (search->_right) {
-				search = search->_right;
-			}
-			return search;
-		}
-		node *rend() const {
-			if (!_root) return begin();
-			return _begin_sentinel;
-		}
-		node *find(const T a) const {
-			if (!_root)
-				return end();
-			node *found = NULL;
-			node *current = _root;
-			while (true) {
-				if (comp(a, current->_elem)){
-					if (!current->_left)
-						break;
-					current = current->_left;
-				} else if (comp(current->_elem, a)){
-					if (!current->_right)
-						break;
-					current = current->_right;
-				} else {
-					found = current;
-					break;
-				}
-			}
-			if (found)
-				return found;
-			return end();
-		}
-		void reroot() {
-			_root = _root->root();
-			_begin_sentinel->_parent = _root;
-			_end_sentinel->_parent = _root;
-		}
-		node *lower_bound(const T a) const {
-			//std::cout << "start of lower bound\n";
-			if (!_root) return end();
-			//std::cout << "there's a root\n";
-			node *current = _root;
-			//std::cout << "current elem before loop: " << current->_elem.first << "\n";
-			while (comp(current->_elem, a)) {
-				//std::cout << "current elem:" << current->_elem << "\n";
-				if (!current->_right)
-					return end();
-				current = current->_right;
-			}
-			//std::cout << "found upper bound: " << current->_elem << "\n";
-			node *found = current;
-			while (true) {
-				if (Compare()(a, current->_elem))
-				{
-					if (current->_left)
-						current = current->_left;
-					else
-						break;
-				}
-				else if (Compare()(current->_elem, a))  {
-					if (current->_right)
-						current = current->_right;
-					else break;
-				}
-				else
-					return current;
-				if (Compare()(current->_elem, found->_elem)
-				&& Compare()(a, current->_elem))
-					found = current;
-			}
-			return found;
-		}
-		/* not the reverse of upper bound, this needs to be strictly after a */
-		/* can also only use this function, and make lower bound a combination of upper_bound and find */
-		node *upper_bound(const T a) const {
-			if (!_root) return end();
-			node *current = _root;
-			while (!Compare()(a, current->_elem)) {
-				if (!current->_right)
-					return end();
-				current = current->_right;
-			}
-			node *found = current;
-			while (true) {
-				if (Compare()(a, current->_elem))
-				{
-					if (current->_left)
-						current = current->_left;
-					else
-						break;
-				}
-				else {
-					if (current->_right)
-						current = current->_right;
-					else break;
-				}
-				if (Compare()(current->_elem, found->_elem)
-				&& Compare()(a, current->_elem))
-					found = current;
-			}
-			return found;
-		}
-		void swap(Avltree &x) {
-		 node *s = _root;
-		 _root = x._root;
-		 x._root = s;
-		 s = _begin_sentinel;
-		 _begin_sentinel = x._begin_sentinel;
-		 x._begin_sentinel = s;
-		 s = _end_sentinel;
-		 _end_sentinel = x._end_sentinel;
-		 x._end_sentinel = s;
-		}
-	private:
-		void rebalance(node *new_node) {
-			int balance;
-			node *parent = new_node->_parent;
-			if (!parent) return;
-			node *grandparent = parent->_parent;
-			if (!grandparent) return;
-			balance = grandparent->get_balance();
-			//std::cout << "balance" << balance << "\n";
-			if (balance > 1) {
-				if (new_node->_elem < parent->_elem) {
-					return grandparent->right_rotate();
-				} else {
-					parent->left_rotate();
-					return grandparent->right_rotate();
-				}
-			} else if (balance < -1)  {
-				if (new_node->_elem > parent->_elem) {
-					return grandparent->left_rotate();
-				} else {
-					parent->right_rotate();
-					return grandparent->left_rotate();
-				}
-			}
-		}
-};
-
 template < class Key,
  class T,
  class Compare = std::less<Key>,
@@ -571,62 +332,279 @@ class map {
 	typedef rev_node_iterator<value_type, value_compare, Alloc> reverse_iterator;
 	typedef rev_node_iterator<value_type, value_compare, Alloc, const value_type *, const value_type &> const_reverse_iterator;
 	private:
-	Avltree<value_type, value_compare, Alloc > _tree;
 	key_compare _comp;
 	allocator_type _alloc;
 	typedef Avlnode<value_type, value_compare, Alloc> node;
+	value_compare vc;
+	//start tree
+	typename Alloc::template rebind<node>::other node_alloc;
+	Avlnode<value_type, value_compare, Alloc> *_root;
+	node *_begin_sentinel;
+	node *_end_sentinel;
+	node *newroot(value_type elem ) {
+		node *np = node_alloc.allocate(1);
+		node n(elem, NULL, _begin_sentinel, _end_sentinel);
+		node_alloc.construct(np, n);
+		_begin_sentinel->_parent = np;
+		_end_sentinel->_parent = np;
+		return np;
+	}
+	node *newsentinel(value_type elem ) {
+		node *np = node_alloc.allocate(1);
+		node n(elem, NULL, NULL, NULL);
+		node_alloc.construct(np, n);
+		return np;
+	}
+	void reroot() {
+		_root = _root->root();
+		_begin_sentinel->_parent = _root;
+		_end_sentinel->_parent = _root;
+	}
+	void rebalance(node *new_node) {
+		int balance;
+		node *parent = new_node->_parent;
+		if (!parent) return;
+		node *grandparent = parent->_parent;
+		if (!grandparent) return;
+		balance = grandparent->get_balance();
+		//std::cout << "balance" << balance << "\n";
+		if (balance > 1) {
+			if (new_node->_elem < parent->_elem) {
+				return grandparent->right_rotate();
+			} else {
+				parent->left_rotate();
+				return grandparent->right_rotate();
+			}
+		} else if (balance < -1)  {
+			if (new_node->_elem > parent->_elem) {
+				return grandparent->left_rotate();
+			} else {
+				parent->right_rotate();
+				return grandparent->left_rotate();
+			}
+		}
+	}
+	node* tree_insert(value_type elem) {
+		if (!_root) {
+			_root = newroot(elem);
+			return _root;
+		}
+		node *current = _root;
+		while (true) {
+			if (vc(elem, current->_elem)) {
+				if (current->_left) {
+					current = current->_left;
+				}
+				else {
+					current->_left = current->newnode(elem);
+					current = current->_left;
+					break;
+				}
+			} else {
+				if (current->_right) {
+					current = current->_right;
+				}
+				else {
+					current->_right = current->newnode(elem);
+					current = current->_right;
+					break;
+				}
+			}
+		}
+		reroot();
+		rebalance(current);
+		reroot();
+		return current;
+	}
+	node *tree_begin() const {
+		if (!_root) return NULL;
+		node *search = _root;
+		while (search->_left) {
+			search = search->_left;
+		}
+		return search;
+	}
+	node *tree_end() const {
+		if (!_root) return tree_begin();
+		return _end_sentinel;
+	}
+	node *tree_rbegin() const {
+		if (!_root) return tree_begin();
+		node *search = _root;
+		while (search->_right) {
+			search = search->_right;
+		}
+		return search;
+	}
+	node *tree_rend() const {
+		if (!_root) return tree_begin();
+		return _begin_sentinel;
+	}
+	node *tree_find(const value_type a) const {
+		if (!_root)
+			return tree_end();
+		node *found = NULL;
+		node *current = _root;
+		while (true) {
+			if (vc(a, current->_elem)){
+				if (!current->_left)
+					break;
+				current = current->_left;
+			} else if (vc(current->_elem, a)){
+				if (!current->_right)
+					break;
+				current = current->_right;
+			} else {
+				found = current;
+				break;
+			}
+		}
+		if (found)
+			return found;
+		return tree_end();
+	}
+	node *lower_bound(const value_type a) const {
+		//std::cout << "start of lower bound\n";
+		if (!_root) return tree_end();
+		//std::cout << "there's a root\n";
+		node *current = _root;
+		//std::cout << "current elem before loop: " << current->_elem.first << "\n";
+		while (vc(current->_elem, a)) {
+			//std::cout << "current elem:" << current->_elem << "\n";
+			if (!current->_right)
+				return tree_end();
+			current = current->_right;
+		}
+		//std::cout << "found upper bound: " << current->_elem << "\n";
+		node *found = current;
+		while (true) {
+			if (vc(a, current->_elem))
+			{
+				if (current->_left)
+					current = current->_left;
+				else
+					break;
+			}
+			else if (vc(current->_elem, a))  {
+				if (current->_right)
+					current = current->_right;
+				else break;
+			}
+			else
+				return current;
+			if (vc(current->_elem, found->_elem)
+					&& vc(a, current->_elem))
+				found = current;
+		}
+		return found;
+	}
+	/* not the reverse of upper bound, this needs to be strictly after a */
+	/* can also only use this function, and make lower bound a combination of upper_bound and find */
+	node *upper_bound(const value_type a) const {
+		if (!_root) return tree_end();
+		node *current = _root;
+		while (!vc(a, current->_elem)) {
+			if (!current->_right)
+				return tree_end();
+			current = current->_right;
+		}
+		node *found = current;
+		while (true) {
+			if (vc(a, current->_elem))
+			{
+				if (current->_left)
+					current = current->_left;
+				else
+					break;
+			}
+			else {
+				if (current->_right)
+					current = current->_right;
+				else break;
+			}
+			if (vc(current->_elem, found->_elem)
+					&& vc(a, current->_elem))
+				found = current;
+		}
+		return found;
+	}
+	void tree_clear() {
+		if (!_root) return;
+		_root->del_children();
+		_root->del();
+		_root = NULL;
+	}
+	void init() {
+		_root = NULL;
+		_begin_sentinel = newsentinel(value_type());
+		_end_sentinel = newsentinel(value_type());
+		_begin_sentinel->_begin_sentinel = _begin_sentinel;
+		_begin_sentinel->_end_sentinel = _end_sentinel;
+		_end_sentinel->_begin_sentinel = _begin_sentinel;
+		_end_sentinel->_end_sentinel = _end_sentinel;
+	}
+	//end tree
 	public:
 	explicit map (const key_compare& comp = key_compare(),
-			const allocator_type& alloc = allocator_type()) : _comp(comp), _alloc(alloc) {};
+			const allocator_type& alloc = allocator_type()) : _comp(comp), _alloc(alloc) {
+		init();
+	};
 	template <class InputIterator>
 		map (InputIterator first, InputIterator last,
 				const key_compare& comp = key_compare(),
 				const allocator_type& alloc = allocator_type()) : _comp(comp), _alloc(alloc) {
-			for (; first != last; first++) insert(*first);
+			init();
+			for (; first != last; first++) {
+				insert(*first);
+			}
 		}
 	~map() {
-	};
+		 _begin_sentinel->del();
+		 _end_sentinel->del();
+		 clear();
+	}
 	map (const map& x) : _comp(x._comp), _alloc(x._alloc) {
+		init();
 		for (const_iterator first = x.begin(); first != x.end(); first++) {
 			insert(*first);
 		}
 	}
 	map& operator= (const map& x) {
-		_tree.clear();
+		tree_clear();
 		for (const_iterator i = x.begin(); i != x.end(); i++) {
 			insert(*i);
 		}
 		return *this;
 	};
-	iterator begin() {return _tree.begin();};
+	iterator begin() {return tree_begin();};
 	const_iterator begin() const {
-		node *n = _tree.begin();
+		node *n = tree_begin();
 		return const_iterator(n);
 	}
-	iterator end() {return _tree.end();};
-	const_iterator end() const {return iterator(_tree.end());};
+	iterator end() {return tree_end();};
+	const_iterator end() const {return iterator(tree_end());};
 
-	reverse_iterator rbegin() {return (_tree.rbegin());};
-	const_reverse_iterator rbegin() const {return _tree.rbegin();};
-	reverse_iterator rend() {return _tree.rend();};
-	const_reverse_iterator rend() const {return iterator(_tree.rend());};
+	reverse_iterator rbegin() {return (tree_rbegin());};
+	const_reverse_iterator rbegin() const {return tree_rbegin();};
+	reverse_iterator rend() {return tree_rend();};
+	const_reverse_iterator rend() const {return iterator(tree_rend());};
 
-	bool empty() const {return !_tree._root;}
+	bool empty() const {return !_root;}
 	size_type size() const {
 		if (empty()) return 0;
-		return _tree._root->size();
+		return _root->size();
 	}
 	size_type max_size() const {return std::numeric_limits<size_type>::max() / sizeof(node);}
 	//Modifiers
 	pair<iterator,bool> insert (const value_type& val) {
 		if (!empty()) {
-			iterator already_exists = _tree.find(val);
+			iterator already_exists = tree_find(val);
 			if (already_exists != end()) {
 				pair<iterator, bool> retval(already_exists, false);
 				return retval;
 			}
 		}
-		iterator inserted = _tree.insert(val);
+		iterator inserted = tree_insert(val);
 		pair<iterator, bool> retval(inserted, true);
 		return retval;
 	}
@@ -637,18 +615,18 @@ class map {
 		return p.first;
 	}
 	template <class InputIterator>
-	void insert (InputIterator first, InputIterator last) {
-		for (;first != last; first++) {
-			insert(*first);
+		void insert (InputIterator first, InputIterator last) {
+			for (;first != last; first++) {
+				insert(*first);
+			}
 		}
-	}
 	mapped_type &operator[] (const key_type &k) {
 		pair<iterator,bool> inserted = insert(pair<key_type, mapped_type>(k,mapped_type()));
 		return (*(inserted.first)).second;
 	}
 	void erase (iterator position) {
 		node *p = reinterpret_cast<node *>(&(*position));
-		_tree._root = p->erase();
+		_root = p->erase();
 		//std::cout << "new root: " << _tree._root->_elem << "\n";
 		//_tree.reroot();
 	}
@@ -666,11 +644,11 @@ class map {
 		delete[] keys;
 	};
 	iterator find (const key_type& k) {
-		return _tree.find(pair<key_type, mapped_type>(k,mapped_type()));
+		return tree_find(pair<key_type, mapped_type>(k,mapped_type()));
 	}
 	const_iterator find (const key_type& k) const {
 		const pair<key_type, mapped_type> p(k,mapped_type());
-		return const_iterator(_tree.find(p));
+		return const_iterator(tree_find(p));
 		//const Avlnode<value_type> *r = reinterpret_cast<const Avlnode<value_type> *>(_tree.find(p));
 		//return r;
 	}
@@ -684,11 +662,19 @@ class map {
 	}
 
 	 void swap (map& x) {
-		 _tree.swap(x._tree);
+		 node *s = _root;
+		 _root = x._root;
+		 x._root = s;
+		 s = _begin_sentinel;
+		 _begin_sentinel = x._begin_sentinel;
+		 x._begin_sentinel = s;
+		 s = _end_sentinel;
+		 _end_sentinel = x._end_sentinel;
+		 x._end_sentinel = s;
 	 }
 	//https://stackoverflow.com/questions/14187006/is-calling-destructor-manually-always-a-sign-of-bad-design
 	 void clear() {
-		 _tree.clear();
+		 tree_clear();
 	 }
 	 key_compare key_comp() const {
 		 return _comp;
@@ -703,16 +689,16 @@ class map {
 		return 1;
 	 };
 	 const_iterator lower_bound (const key_type& k) const {
-		return _tree.lower_bound(value_type(k, mapped_type()));
+		return lower_bound(value_type(k, mapped_type()));
 	 }
 	 iterator lower_bound (const key_type& k) {
-		return _tree.lower_bound(value_type(k, mapped_type()));
+		return lower_bound(value_type(k, mapped_type()));
 	 }
 	 const_iterator upper_bound (const key_type& k) const {
-		return _tree.upper_bound(value_type(k, mapped_type()));
+		return upper_bound(value_type(k, mapped_type()));
 	 }
 	 iterator upper_bound (const key_type& k) {
-		return _tree.upper_bound(value_type(k, mapped_type()));
+		return upper_bound(value_type(k, mapped_type()));
 	 }
 	 pair<const_iterator,const_iterator> equal_range (const key_type& k) const {
 		 const_iterator i = find(k);

@@ -553,6 +553,7 @@ static void test_map_constructors() {
 	m["b"] = 11;
 	std::cout << "copy constructor:\n";
 	map<std::string, int> m2 = m;
+	std::cout << "after copy constructor:\n";
 	m2["d"] = 4;
 	m2["c"] = 5;
 	print_elems(m);

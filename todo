@@ -22,6 +22,7 @@ up next:
 	make map more balanced
 	functions like advance?
 	https://m.cplusplus.com/reference/iterator/
+	there's still TODO's
 
 check all nodes for rebalancing? or only parts where there has been an insertion or deletion?
 
