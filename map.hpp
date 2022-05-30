@@ -9,7 +9,7 @@
 #include "pair.hpp"
 namespace ft {
 
-template <class T, class Compare, class Alloc>
+template <class T, class Alloc>
 struct Avlnode {
 	T _elem;
 	Avlnode *_left;
@@ -331,11 +331,11 @@ class map {
 	private:
 	key_compare _comp;
 	allocator_type _alloc;
-	typedef Avlnode<value_type, value_compare, Alloc> node;
+	typedef Avlnode<value_type, Alloc> node;
 	value_compare vc;
 	//start tree
 	typename Alloc::template rebind<node>::other node_alloc;
-	Avlnode<value_type, value_compare, Alloc> *_root;
+	Avlnode<value_type, Alloc> *_root;
 	node *_begin_sentinel;
 	node *_end_sentinel;
 	node *newroot(value_type elem ) {

@@ -14,8 +14,8 @@ void print_avl(void *a , int spaces ) {
 #	include "vector.hpp"
 #	include "map.hpp"
 	using namespace ft;
-template <typename T, class Compare, class Alloc>
-void print_avl(ft::Avlnode<T, Compare, Alloc> *a , int spaces ) {
+template <typename T, class Alloc>
+void print_avl(ft::Avlnode<T, Alloc> *a , int spaces ) {
 	if (!a) return;
 	print_avl(a->_right, spaces + 5 );
 	for (int i = 1; i <= spaces; ++i ) {

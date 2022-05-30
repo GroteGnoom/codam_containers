@@ -6,12 +6,12 @@
 namespace ft {
 
 struct bidirectional_iterator_tag {};
-template <class T, class Compare, class Alloc>
+template <class T, class Alloc>
 struct Avlnode;
 
 template <typename T, class Compare, class Alloc, class Pointer = T*, class Reference = T& >
-class node_iterator : public general_iterator<bidirectional_iterator_tag, Avlnode<T, Compare, Alloc> > {
-	typedef general_iterator<bidirectional_iterator_tag, Avlnode<T, Compare, Alloc> > base_type;
+class node_iterator : public general_iterator<bidirectional_iterator_tag, Avlnode<T, Alloc> > {
+	typedef general_iterator<bidirectional_iterator_tag, Avlnode<T, Alloc> > base_type;
 	private:
 	typename base_type::pointer _pointer;
 	public:
@@ -67,8 +67,8 @@ class node_iterator : public general_iterator<bidirectional_iterator_tag, Avlnod
 
 //https://www.cplusplus.com/reference/iterator/reverse_iterator/
 template <typename T, class Compare, class Alloc, class Pointer = T*, class Reference = T& >
-class rev_node_iterator : public general_iterator<bidirectional_iterator_tag, Avlnode<T, Compare, Alloc> > {
-	typedef general_iterator<bidirectional_iterator_tag, Avlnode<T, Compare, Alloc> > base_type;
+class rev_node_iterator : public general_iterator<bidirectional_iterator_tag, Avlnode<T, Alloc> > {
+	typedef general_iterator<bidirectional_iterator_tag, Avlnode<T, Alloc> > base_type;
 	private:
 	node_iterator<T, Compare, Alloc> _base;
 	public:
