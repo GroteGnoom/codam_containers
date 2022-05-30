@@ -26,6 +26,8 @@ class rev_ra_iterator : public general_iterator<random_access_iterator_tag, T> {
 		}
 		~rev_ra_iterator() {}
 		T* base() const {return _base;}
+
+		T* operator->() const { return _base; }
 		T& operator*() const { return *_base; }
 		rev_ra_iterator operator+(Distance a) const {
 			return rev_ra_iterator(_base - a);
@@ -58,7 +60,6 @@ class rev_ra_iterator : public general_iterator<random_access_iterator_tag, T> {
 		Distance operator-(const const_rev_ra_iterator &a) const {
 			return a.base() - _base;
 		}
-		T* operator->() const { return _base; }
 		T& operator[](size_t idx) {
 			return *(_base - idx);
 		}
