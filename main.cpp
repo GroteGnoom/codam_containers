@@ -509,8 +509,8 @@ void typedefs() {
 	check_type(const_pointer);
 	check_type(iterator);
 	check_type(const_iterator);
-	//TODO check_type(reverse_iterator);
-	//TODO check_type(const_reverse_iterator);
+	check_type(reverse_iterator);
+	check_type(const_reverse_iterator);
 	check_type(difference_type);
 	check_type(size_type);
 #undef check_type
@@ -612,7 +612,7 @@ static void test_map_capacity() {
 	std::cout << "What the dereferenced iterator value via ->? " << a.first->second << "\n";
 	a = m.insert(pair<std::string, int>("hoi", 10));
 	std::cout << "Try to add the same key, should do nothing, so same key has same value: " << a.first->second << "\n";
-	//std::cout << "What is the max size?" << m.max_size() << "\n"; //TODO check by hand? They don't have to be the same. Maybe nodes will be bigger with more state to make things quicker
+	//std::cout << "What is the max size?" << m.max_size() << "\n"; They don't have to be the same. Maybe nodes will be bigger with more state to make things quicker
 	a = m.insert(pair<std::string, int>("banaan", 20));
 	std::cout << "Try to add different key: " << a.first->second << "\n";
 }

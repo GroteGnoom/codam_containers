@@ -1,8 +1,6 @@
 #ifndef MAP_HPP
 #define MAP_HPP
 #include <algorithm> /*max*/
-#include <iostream> //TODO remove
-#include <assert.h> //TODO remove
 #include <cstddef>
 #include <memory> /* allocator */
 #include "node_iterator.hpp"
@@ -67,7 +65,6 @@ struct Avlnode {
 	}
 	void left_rotate() {
 		Avlnode *y = _right;
-		assert(y);
 		this->_right = y->_left;
 		if (this->_parent)
 		{
@@ -671,7 +668,6 @@ class map {
 
 	//erase range
 	void erase (iterator first, iterator last) {
-		//TODO proper solution
 		key_type* keys = new key_type[size()];
 		int i = 0;
 		for (;first != last; first++) {
