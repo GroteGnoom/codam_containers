@@ -39,6 +39,78 @@ class iterator_traits<const T*> {
 		typedef random_access_iterator_tag iterator_category;
 };
 
+//reverse_iterator
+template<typename Itr>
+class reverse_iterator {
+    Itr current;
+public:
+	typedef Itr iterator_type;
+	typedef typename iterator_traits<Itr>::iterator_category iterator_category ;
+	typedef typename iterator_traits<Itr>::value_type value_type;
+	typedef typename iterator_traits<Itr>::difference_type difference_type;
+	typedef typename iterator_traits<Itr>::pointer pointer;
+	typedef typename iterator_traits<Itr>::reference reference;
+
+	//Constructors
+	reverse_iterator() : current(Itr()) {};
+	explicit reverse_iterator( iterator_type x ) : current(x) {};
+	template< class U >
+	reverse_iterator( const reverse_iterator<U>& other ) : current(other.current) {};
+
+	//Copy assignment
+	template< class U >
+	reverse_iterator& operator=( const reverse_iterator<U>& other ) {
+		current = other.base();
+	};
+
+	Itr base() { return current; }
+
+	value_type& operator*() const {
+		Itr i = current;
+		i--;
+		return *i;
+	}
+	value_type* operator->() const { 
+		return std::addressof(operator*());
+   	}
+	value_type& operator[](size_t idx) {
+		return *(current - idx);
+	}
+	const value_type& operator[](size_t idx) const {
+		return *(current - idx);
+	}
+	reverse_iterator &operator++() {
+		current -= 1;
+		return *this;
+	}
+	reverse_iterator operator++(int) {
+		return reverse_iterator(current--);
+	}
+	reverse_iterator &operator+=(difference_type a) {
+		current -= a;
+		return *this;
+	}
+	reverse_iterator operator+(difference_type a) const {
+		return reverse_iterator(current - a);
+	}
+	reverse_iterator &operator--() {
+		current += 1;
+		return *this;
+	}
+	reverse_iterator operator--(int) {
+		return reverse_iterator(current++);
+	}
+	reverse_iterator &operator-=(difference_type a) {
+		current += a;
+		return *this;
+	}
+	reverse_iterator operator-(difference_type a) const {
+		return reverse_iterator(current + a);
+	}
+	difference_type operator-(const reverse_iterator &a) const {
+		return a.base() - current;
+	}
+};
 
 template <class T>
 struct is_integral{

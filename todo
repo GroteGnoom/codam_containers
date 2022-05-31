@@ -23,6 +23,7 @@ up next:
 	functions like advance?
 	https://m.cplusplus.com/reference/iterator/
 	there's still TODO's
+	use hint for map insert?
 
 check all nodes for rebalancing? or only parts where there has been an insertion or deletion?
 
@@ -45,6 +46,14 @@ map:
 	
 	iterator
 	reverse_iterator
+
+	Iterators
+	Capacity
+	Element access
+	Modifiers
+	Observers
+	Operations
+	Allocator
 
 
 std::pair

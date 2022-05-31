@@ -548,30 +548,41 @@ class map {
 	}
 	//end tree
 	public:
+
+	//Constructors 
+
+	//empty
 	explicit map (const key_compare& comp = key_compare(),
 			const allocator_type& alloc = allocator_type()) : _comp(comp), _alloc(alloc) {
 		init();
 	};
+
+	//range
 	template <class InputIterator>
-		map (InputIterator first, InputIterator last,
-				const key_compare& comp = key_compare(),
-				const allocator_type& alloc = allocator_type()) : _comp(comp), _alloc(alloc) {
-			init();
-			for (; first != last; first++) {
-				insert(*first);
-			}
+	map (InputIterator first, InputIterator last,
+			const key_compare& comp = key_compare(),
+			const allocator_type& alloc = allocator_type()) : _comp(comp), _alloc(alloc) {
+		init();
+		for (; first != last; first++) {
+			insert(*first);
 		}
-	~map() {
-		 _begin_sentinel->del();
-		 _end_sentinel->del();
-		 clear();
 	}
+
+	//copy
 	map (const map& x) : _comp(x._comp), _alloc(x._alloc) {
 		init();
 		for (const_iterator first = x.begin(); first != x.end(); first++) {
 			insert(*first);
 		}
 	}
+	//destructor
+	~map() {
+		 _begin_sentinel->del();
+		 _end_sentinel->del();
+		 clear();
+	}
+
+	//copy assignment
 	map& operator= (const map& x) {
 		tree_clear();
 		for (const_iterator i = x.begin(); i != x.end(); i++) {
@@ -579,18 +590,22 @@ class map {
 		}
 		return *this;
 	};
+	
+	//Iterators
+
 	iterator begin() {return tree_begin();};
-	const_iterator begin() const {
-		node *n = tree_begin();
-		return const_iterator(n);
-	}
+	const_iterator begin() const { return tree_begin(); }
+
 	iterator end() {return tree_end();};
 	const_iterator end() const {return iterator(tree_end());};
 
 	reverse_iterator rbegin() {return (tree_rbegin());};
 	const_reverse_iterator rbegin() const {return tree_rbegin();};
+
 	reverse_iterator rend() {return tree_rend();};
 	const_reverse_iterator rend() const {return iterator(tree_rend());};
+
+	//Capacity
 
 	bool empty() const {return !_root;}
 	size_type size() const {
@@ -598,7 +613,17 @@ class map {
 		return _root->size();
 	}
 	size_type max_size() const {return std::numeric_limits<size_type>::max() / sizeof(node);}
+
+	//Element access 
+
+	mapped_type &operator[] (const key_type &k) {
+		pair<iterator,bool> inserted = insert(pair<key_type, mapped_type>(k,mapped_type()));
+		return (*(inserted.first)).second;
+	}
+
 	//Modifiers
+
+	//single element insert
 	pair<iterator,bool> insert (const value_type& val) {
 		if (!empty()) {
 			iterator already_exists = tree_find(val);
@@ -611,28 +636,40 @@ class map {
 		pair<iterator, bool> retval(inserted, true);
 		return retval;
 	}
+
+	//insert with hint
 	iterator insert (iterator position, const value_type& val) {
 		(void) position;
-		//TODO hint?
 		pair<iterator,bool> p = insert(val);
 		return p.first;
 	}
+
+	//insert range
 	template <class InputIterator>
 		void insert (InputIterator first, InputIterator last) {
 			for (;first != last; first++) {
 				insert(*first);
 			}
 		}
-	mapped_type &operator[] (const key_type &k) {
-		pair<iterator,bool> inserted = insert(pair<key_type, mapped_type>(k,mapped_type()));
-		return (*(inserted.first)).second;
-	}
+
+	//erase position
 	void erase (iterator position) {
 		node *p = reinterpret_cast<node *>(&(*position));
 		_root = p->erase();
 		//std::cout << "new root: " << _tree._root->_elem << "\n";
 		//_tree.reroot();
 	}
+
+	//erase key
+	size_type erase (const key_type& k) {
+		iterator i = find(k);
+		if (i == end())
+			return 0;
+		erase(i);
+		return 1;
+	}
+
+	//erase range
 	void erase (iterator first, iterator last) {
 		//TODO proper solution
 		key_type* keys = new key_type[size()];
@@ -646,23 +683,6 @@ class map {
 		}
 		delete[] keys;
 	};
-	iterator find (const key_type& k) {
-		return tree_find(pair<key_type, mapped_type>(k,mapped_type()));
-	}
-	const_iterator find (const key_type& k) const {
-		const pair<key_type, mapped_type> p(k,mapped_type());
-		return const_iterator(tree_find(p));
-		//const Avlnode<value_type> *r = reinterpret_cast<const Avlnode<value_type> *>(_tree.find(p));
-		//return r;
-	}
-
-	size_type erase (const key_type& k) {
-		iterator i = find(k);
-		if (i == end())
-			return 0;
-		erase(i);
-		return 1;
-	}
 
 	 void swap (map& x) {
 		 node *s = _root;
@@ -675,34 +695,50 @@ class map {
 		 _end_sentinel = x._end_sentinel;
 		 x._end_sentinel = s;
 	 }
-	//https://stackoverflow.com/questions/14187006/is-calling-destructor-manually-always-a-sign-of-bad-design
+
 	 void clear() {
 		 tree_clear();
 	 }
+
+	//Observers
+
 	 key_compare key_comp() const {
 		 return _comp;
 	 };
 	 value_compare value_comp() const {
 		 return value_compare(key_comp());
 	 }
+
+	 //Operations
+	iterator find (const key_type& k) {
+		return tree_find(pair<key_type, mapped_type>(k,mapped_type()));
+	}
+	const_iterator find (const key_type& k) const {
+		const pair<key_type, mapped_type> p(k,mapped_type());
+		return const_iterator(tree_find(p));
+	}
+
 	 size_type count (const key_type& k) const {
 		const_iterator i = find(k);
 		if (i == end())
 		 return 0;
 		return 1;
 	 };
+
 	 const_iterator lower_bound (const key_type& k) const {
 		return lower_bound(value_type(k, mapped_type()));
 	 }
 	 iterator lower_bound (const key_type& k) {
 		return lower_bound(value_type(k, mapped_type()));
 	 }
+
 	 const_iterator upper_bound (const key_type& k) const {
 		return upper_bound(value_type(k, mapped_type()));
 	 }
 	 iterator upper_bound (const key_type& k) {
 		return upper_bound(value_type(k, mapped_type()));
 	 }
+
 	 pair<const_iterator,const_iterator> equal_range (const key_type& k) const {
 		 const_iterator i = find(k);
 		 if (i != end()) {
@@ -717,6 +753,8 @@ class map {
 		 }
 		 return pair<iterator,iterator>(upper_bound(k), upper_bound(k));
 	 }
+
+	 //Allocator
 	 allocator_type get_allocator() const {return _alloc;};
 }; //map
 } //namespace

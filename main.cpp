@@ -710,6 +710,38 @@ static void test_map_allocator() {
 	m.get_allocator().deallocate(p, 3);
 }
 
+static void test_reverse_iterator() {
+	vector<int> v;
+	v.push_back(5);
+	v.push_back(6);
+	v.push_back(7);
+	v.push_back(8);
+	v.push_back(9);
+
+	reverse_iterator<vector<int>::iterator> ri1;
+	vector<int>::iterator i1 = v.begin();
+	i1++;
+	i1++;
+
+	reverse_iterator<vector<int>::iterator> ri2(i1);
+	reverse_iterator<vector<int>::iterator> ri3 = ri2;
+
+	vector<int>::iterator b = ri1.base();
+	(void) ri1;
+	(void) ri2;
+	(void) ri3;
+	(void) b;
+
+	std::cout << *ri2 << "\n";
+	std::cout << *(++ri2++) << "\n";
+	std::cout << *(--ri2--) << "\n";
+	std::cout << *(ri2 + 1) << "\n";
+	std::cout << *(ri2 - 1) << "\n";
+	ri2 += 1;
+	ri2 -= 1;
+	std::cout << *ri2 << "\n";
+}
+
 void test_map() {
 #define check_type(a) do {(void)sizeof(map<std::string, int>::a);} while (0)
 	check_type(key_type);
@@ -737,7 +769,6 @@ void test_map() {
 	test_map_observers();
 	test_map_operations();
 	test_map_allocator();
-
 }
 
 void test_pair() {
@@ -752,4 +783,5 @@ int main() {
 	test_pair();
 	test_vector();
 	test_map();
+	test_reverse_iterator();
 }
