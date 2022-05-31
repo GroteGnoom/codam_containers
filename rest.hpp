@@ -131,6 +131,17 @@ ptrdiff_t operator-(const reverse_iterator<T> a, const reverse_iterator<T> &b) {
 	return b.base() - a.base();
 }
 
+//enable_if 
+
+// this makes a templated struct. so enable_if<Cond, T>
+template<bool Cond, class T = void> struct enable_if {};
+
+//This one only matches if Cond is true. That means type will get typedefd to T, so you have to put the enable_if::type in place of your normal type
+// if the condition is not true the typedef will not happen, and the compler will look for other functions
+template<class T> struct enable_if<true, T> { typedef T type; };
+
+
+//is_integral
 
 template <class T>
 struct is_integral{
@@ -211,12 +222,6 @@ bool equal (InputIterator1 b1, InputIterator1 e1,
 
 
 
-// this makes a templated struct. so enable_if<Cond, T>
-template<bool Cond, class T = void> struct enable_if {};
-
-//This one only matches if Cond is trye. That means type will get typedefd to T, so you have to put the enable_if::type in place of your normal type
-// if the condition is not true the typedef will not happen, and the compler will look for other functions
-template<class T> struct enable_if<true, T> { typedef T type; };
 
 
 

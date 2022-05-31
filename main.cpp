@@ -161,8 +161,8 @@ static void iter() {
 		}
 		std::cout << "begin: " << *v.begin() << "\n";
 		std::cout << "end: " << *(v.end() - 1) << "\n";
-		//TODO: std::cout << "rbegin: " << *(v.rbegin()) << "\n";
-		//TODO: std::cout << "rend: " << *(v.rend()) << "\n";
+		std::cout << "rbegin: " << *(v.rbegin()) << "\n";
+		std::cout << "rend: " << *(v.rend() - 1) << "\n";
 	}
 	{
 		std::cout << "\nconst version:\n";
@@ -170,8 +170,8 @@ static void iter() {
 		const vector<int> v(10, 5);
 		std::cout << "begin: " << *v.begin() << "\n";
 		std::cout << "end: " << *(v.end() - 1) << "\n";
-		//TODO: std::cout << "rbegin: " << *(v.rbegin()) << "\n";
-		//TODO: std::cout << "rend: " << *(v.rend()) << "\n";
+		std::cout << "rbegin: " << *(v.rbegin()) << "\n";
+		std::cout << "rend: " << *(v.rend() - 1) << "\n";
 	}
 	{
 		vector<int> v;
@@ -577,6 +577,9 @@ static void test_map_iterators() {
 	map<std::string, int>::iterator i2 = m.end();
 	map<std::string, int>::reverse_iterator i3 = m.rbegin();
 	map<std::string, int>::reverse_iterator i4 = m.rend();
+	map<std::string, int>::iterator i6(i2);
+	map<std::string, int>::reverse_iterator i7(i3);
+	
 	std::cout << *i1 << "\n";
 	std::cout << *(--i2) << "\n";
 	std::cout << i3->first << "\n";
@@ -589,6 +592,8 @@ static void test_map_iterators() {
 	std::cout << *(i3--) << "\n";
 	std::cout << *(i3++) << "\n";
 	std::cout << *(--i3) << "\n";
+	std::cout << *(--i6) << "\n";
+	std::cout << *(i7) << "\n";
 
 }
 
@@ -726,11 +731,8 @@ static void test_reverse_iterator() {
 	reverse_iterator<vector<int>::iterator> ri2(i1);
 	reverse_iterator<vector<int>::iterator> ri3 = ri2;
 
-	vector<int>::iterator b = ri1.base();
-	(void) ri1;
-	(void) ri2;
-	(void) ri3;
-	(void) b;
+	vector<int>::iterator b = ri2.base();
+	std::cout << *b << "\n";
 
 
 	std::cout << *ri2 << "\n";
@@ -791,9 +793,18 @@ void test_map() {
 
 void test_pair() {
 	pair<std::string, int> p1;
-	pair<std::string, int> p2;
+	pair<std::string, int> p2 ("bla", 5);
+	pair<std::string, int> p3(p2);
+	pair<std::string, int> p4("bloe", 6);
 	p1 = p2;
-	//TODO everything else
+
+	std::cout << (p2 == p4) << "\n";
+	std::cout << (p2 != p4) << "\n";
+	std::cout << (p2 < p4) << "\n";
+	std::cout << (p2 <= p4) << "\n";
+	std::cout << (p2 > p4) << "\n";
+	std::cout << (p2 >= p4) << "\n";
+	p1 = make_pair("asf", 7);
 }
 
 

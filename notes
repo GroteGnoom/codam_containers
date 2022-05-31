@@ -60,3 +60,6 @@ to optimize!
 
 
 https://stackoverflow.com/questions/14187006/is-calling-destructor-manually-always-a-sign-of-bad-design
+
+pretty important:
+You have to take the structure of each standard container as reference. If a part of the Orthodox Canonical form is missing in it, do not implement it.

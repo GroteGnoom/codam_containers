@@ -18,7 +18,8 @@ class node_iterator : public general_iterator<bidirectional_iterator_tag, Avlnod
 	//Constructors 
 	node_iterator(typename base_type::pointer p) : _pointer(p) {}
 	node_iterator() : _pointer(NULL) {}
-	//TODO copy constructor
+	//Copy constructor
+	node_iterator(const node_iterator& n) : _pointer(n._pointer) {}
 	
 	//Copy assignment
 	node_iterator &operator=(const node_iterator &it) {
