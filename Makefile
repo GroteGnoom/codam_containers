@@ -30,10 +30,10 @@ pretest:
 	./containers
 
 test:
-	$(MAKE) re STD=1
-	./containers > std_output
 	$(MAKE) re DEBUG=1
 	./containers > output
+	$(MAKE) re STD=1
+	./containers > std_output
 	diff -a std_output output
 	$(MAKE) -C ext #TODO remove
 	#$(MAKE) re DEBUG=1 SRC=test_avl.cpp NAME=test_avl

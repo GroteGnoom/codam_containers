@@ -28,6 +28,7 @@ void print_avl(ft::Avlnode<T, Alloc> *a , int spaces ) {
 #endif
 
 #include <iostream>
+#include "printing.hpp"
 
 template <typename T>
 std::ostream &operator<<(std::ostream &out, const vector<T> &v) {
@@ -558,6 +559,37 @@ static void test_map_constructors() {
 	m2["c"] = 5;
 	print_elems(m);
 	print_elems(m2);
+	map<std::string, int> m3;
+	m3 = m;
+	m3["e"] = 6;
+	m3["f"] = 7;
+	print_elems(m);
+	print_elems(m3);
+}
+
+static void test_map_iterators() {
+	map<std::string, int> m;
+	m["a"] = 100;
+	m["b"] = 11;
+	m["la"] = 101;
+	m["blba"] = 5;
+	map<std::string, int>::iterator i1 = m.begin();
+	map<std::string, int>::iterator i2 = m.end();
+	map<std::string, int>::reverse_iterator i3 = m.rbegin();
+	map<std::string, int>::reverse_iterator i4 = m.rend();
+	std::cout << *i1 << "\n";
+	std::cout << *(--i2) << "\n";
+	std::cout << i3->first << "\n";
+
+	map<std::string, int>::reverse_iterator i5;
+	i5 = i4;
+	std::cout << (i3 == i5) << "\n";
+	std::cout << (i3 != i5) << "\n";
+	std::cout << *(++i3) << "\n";
+	std::cout << *(i3--) << "\n";
+	std::cout << *(i3++) << "\n";
+	std::cout << *(--i3) << "\n";
+
 }
 
 static void test_map_capacity() {
@@ -588,9 +620,9 @@ static void test_map_element_access() {
 	m["a"] = 20;
 	std::cout << "add a = 20, a is " << m["a"] << "\n";
 	std::cout << "aa a is " << m["aa"] << "\n";
-	std::cout << "bb is " << m["bb"] << "\n"; //TODO leaks
-	std::cout << "bb is " << m["bb"] << "\n"; //TODO leaks
-	std::cout << "bb is " << m["bb"] << "\n"; //TODO leaks
+	std::cout << "bb is " << m["bb"] << "\n";
+	std::cout << "bb is " << m["bb"] << "\n";
+	std::cout << "bb is " << m["bb"] << "\n";
 
 	std::cout << "What is its size? " << m.size() << "\n";
 	m.erase("a");
@@ -623,6 +655,10 @@ static void test_map_modifiers() {
 	std::cout << "What is the size the new tree after swap" << m2.size() << "\n";
 	m.clear();
 	std::cout << "What is the size old tree after clear" << m.size() << "\n";
+}
+
+static void test_map_observers() {
+	map<std::string, int> m;
 
 	map<std::string, int>::key_compare kc = m.key_comp();
 	std::cout << "compare a and b:" << kc("a", "b") << "\n";
@@ -632,8 +668,14 @@ static void test_map_modifiers() {
 	map<std::string, int>::value_type v1;
 	map<std::string, int>::value_type v2;
 	std::cout << "compare with value type:" << vc(v1, v2) << "\n";
+}
 
+static void test_map_operations() {
+	map<std::string, int> m;
+	map<std::string, int> m2;
 
+	m2["aa"] = 12;
+	m2["ablaa"] = 12;
 	std::cout << "count aa: " << m2.count("aa") << "\n";
 	std::cout << "count cc: " << m2.count("cc") << "\n";
 
@@ -648,6 +690,24 @@ static void test_map_modifiers() {
 	std::cout << "range a: " << it_to_key(m2.equal_range("a").first, m2) << " " << it_to_key(m2.equal_range("a").second, m2) << "\n";
 	std::cout << "range b: " << it_to_key(m2.equal_range("b").first, m2) << " " << it_to_key(m2.equal_range("b").second, m2) << "\n";
 	std::cout << "range c: " << it_to_key(m2.equal_range("c").first, m2) << " " << it_to_key(m2.equal_range("c").second, m2) << "\n";
+}
+
+static void test_map_allocator() {
+	std::cout << "allocator: \n";
+	map<std::string, int> m;
+	pair<const std::string, int> *p;
+	p = m.get_allocator().allocate(3);
+	for (int i = 0; i < 3; i++) {
+		m.get_allocator().construct(p + i, pair<std::string, int>("jaja ", 5));
+	}
+	for (int i = 0; i < 3; i++) {
+		std::cout << p[i];
+	}
+	std::cout << "\n";
+	for (int i = 0; i < 3; i++) {
+		m.get_allocator().destroy(p + i);
+	}
+	m.get_allocator().deallocate(p, 3);
 }
 
 void test_map() {
@@ -670,9 +730,13 @@ void test_map() {
 	check_type(size_type);
 #undef check_type
 	test_map_constructors();
+	test_map_iterators();
 	test_map_capacity();
 	test_map_element_access();
 	test_map_modifiers();
+	test_map_observers();
+	test_map_operations();
+	test_map_allocator();
 
 }
 

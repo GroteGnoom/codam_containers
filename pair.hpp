@@ -45,12 +45,6 @@ template <class T1, class T2>
 pair<T1, T2> make_pair(T1 t1, T2 t2) {return pair<T1, T2>(t1, t2);}
 
 template <class T1, class T2>
-std::ostream &operator<<(std::ostream &out, const pair<T1,T2> &p) {
-	out << "(" << p.first << ", " << p.second << ")";
-	return out;
-}
-
-template <class T1, class T2>
 bool operator== (const pair<T1,T2>& a, const pair<T1,T2>& b) {return a.first == b.first && a.second == b.second;}
 template <class T1, class T2>
 bool operator!= (const pair<T1,T2>& a, const pair<T1,T2>& b) {return !(a==b);}

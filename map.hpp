@@ -17,10 +17,16 @@ struct Avlnode {
 	Avlnode *_parent;
 	Avlnode *_begin_sentinel;
 	Avlnode *_end_sentinel;
-	Avlnode(T elem, Avlnode *parent, Avlnode *begin_sentinel, Avlnode *end_sentinel) : _elem(elem), _left(NULL), _right(NULL), _parent(parent), _begin_sentinel(begin_sentinel), _end_sentinel(end_sentinel) {}
-	Avlnode(Avlnode *root, Avlnode *begin_sentinel, Avlnode *end_sentinel) : _elem(T()), _left(NULL), _right(NULL), _parent(root), _begin_sentinel(begin_sentinel), _end_sentinel(end_sentinel) {}
+	Avlnode(T elem, Avlnode *parent, Avlnode *begin_sentinel, Avlnode *end_sentinel) :
+	   	_elem(elem), _left(NULL), _right(NULL), _parent(parent), 
+		_begin_sentinel(begin_sentinel), _end_sentinel(end_sentinel) {}
+	Avlnode(Avlnode *root, Avlnode *begin_sentinel, Avlnode *end_sentinel) :
+	   	_elem(T()), _left(NULL), _right(NULL), _parent(root),
+	   	_begin_sentinel(begin_sentinel), _end_sentinel(end_sentinel) {}
 	typename Alloc::template rebind<Avlnode>::other node_alloc;
-	Avlnode(const Avlnode &a) : _elem(a._elem), _left(a._left), _right(a._right), _parent(a._parent), _begin_sentinel(a._begin_sentinel), _end_sentinel(a._end_sentinel) {
+	Avlnode(const Avlnode &a) : 
+		_elem(a._elem), _left(a._left), _right(a._right), _parent(a._parent),
+	   	_begin_sentinel(a._begin_sentinel), _end_sentinel(a._end_sentinel) {
 	}
 	Avlnode &operator=(const Avlnode &a) {
 		_elem = a._elem;
