@@ -63,7 +63,7 @@ public:
 		current = other.base();
 	};
 
-	Itr base() { return current; }
+	Itr base() const { return current; }
 
 	value_type& operator*() const {
 		Itr i = current;
@@ -111,6 +111,26 @@ public:
 		return a.base() - current;
 	}
 };
+
+#define op(a, b) template <class Iterator> bool operator a (const reverse_iterator<Iterator>& lhs, const reverse_iterator<Iterator>& rhs) {return lhs.base() b rhs.base();}
+op(<, >)
+op(<=, >=)
+op(>, <)
+op(>=, <=)
+op(==, ==)
+op(!=, !=)
+#undef op
+
+template <typename T>
+reverse_iterator<T> operator+(ptrdiff_t a, const reverse_iterator<T> &b) {
+	return b + a;
+}
+
+template <typename T>
+ptrdiff_t operator-(const reverse_iterator<T> a, const reverse_iterator<T> &b) {
+	return b.base() - a.base();
+}
+
 
 template <class T>
 struct is_integral{

@@ -732,6 +732,7 @@ static void test_reverse_iterator() {
 	(void) ri3;
 	(void) b;
 
+
 	std::cout << *ri2 << "\n";
 	std::cout << *(++ri2++) << "\n";
 	std::cout << *(--ri2--) << "\n";
@@ -740,6 +741,23 @@ static void test_reverse_iterator() {
 	ri2 += 1;
 	ri2 -= 1;
 	std::cout << *ri2 << "\n";
+	std::cout << (ri2 < ri3) << "\n";
+	std::cout << (ri2 <= ri3) << "\n";
+	std::cout << (ri2 > ri3) << "\n";
+	std::cout << (ri2 >= ri3) << "\n";
+	std::cout << (ri2 == ri3) << "\n";
+	std::cout << (ri2 != ri3) << "\n";
+
+	ri1 = ri2;
+	ri1--;
+	std::cout << (ri2 < ri1) << "\n";
+	std::cout << (ri2 <= ri1) << "\n";
+	std::cout << (ri2 > ri1) << "\n";
+	std::cout << (ri2 >= ri1) << "\n";
+	std::cout << (ri2 == ri1) << "\n";
+	std::cout << (ri2 != ri1) << "\n";
+	std::cout << (ri2 - ri1) << "\n";
+	std::cout << *(1 + ri1) << "\n";
 }
 
 void test_map() {
