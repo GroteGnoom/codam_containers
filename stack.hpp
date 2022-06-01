@@ -11,7 +11,7 @@ namespace ft {
 
 template <class T, class Container = vector<T> > class stack {
 	protected:
-	Container _ctnr;
+	Container c;
 	public:
 	//Member types
 	typedef T value_type;
@@ -19,23 +19,23 @@ template <class T, class Container = vector<T> > class stack {
 	typedef size_t size_type;
 
 	//constructor
-	explicit stack (const container_type& ctnr = container_type()) : _ctnr(ctnr) {};
+	explicit stack (const container_type& ctnr = container_type()) : c(ctnr) {};
 
 
-	bool empty() const {return _ctnr.empty();}
+	bool empty() const {return c.empty();}
 
-	size_type size() const {return _ctnr.size();};
+	size_type size() const {return c.size();};
 
-	value_type& top() {return *(_ctnr.end() - 1);};
-	const value_type& top() const {return *(_ctnr.end() - 1);};
+	value_type& top() {return *(c.end() - 1);};
+	const value_type& top() const {return *(c.end() - 1);};
 
-	void push (const value_type& val) {_ctnr.push_back(val);};
+	void push (const value_type& val) {c.push_back(val);};
 
-	void pop() {_ctnr.pop_back();};
+	void pop() {c.pop_back();};
 };
 
 //Non-member function overloads
-#define op(a) template <class T, class Container> bool operator a (const stack<T,Container>& lhs, const stack<T,Container>& rhs) { return lhs._ctnr a rhs._ctnr; }
+#define op(a) template <class T, class Container> bool operator a (const stack<T,Container>& lhs, const stack<T,Container>& rhs) { return lhs.c a rhs.c; }
 
 op(==)
 op(!=)

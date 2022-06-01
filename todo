@@ -1,33 +1,12 @@
-reverse_iterator
-enable_if
-
-map stack set
-
-Any function implementation put in a header file (except for function templates) means 0 to the exercise?
-
-checking NULL from allocator?
-
-know what explicit means
-
-
 todo forever:
 remove assertions
 do TODOs
 no new or delete where there should be an alloc;
 
 up next:
-	stack
-	clean up!
-	for vector operator = you should preserve the allocator
-	lots of things private
-	make map more balanced
-	functions like advance?
-	https://m.cplusplus.com/reference/iterator/
-	there's still TODO's
+	know what explicit means
 	use hint for map insert?
-	container of stack needs to be protected?
 
-check all nodes for rebalancing? or only parts where there has been an insertion or deletion?
 
 checked:
 vector:
@@ -67,6 +46,10 @@ equal
 lexicographical_compare
 std::pair
 std::make_pair
+
+optimizations:
+check all nodes for rebalancing? or only parts where there has been an insertion or deletion?
+use more state in map to make calculations quicker
 
 
 done:

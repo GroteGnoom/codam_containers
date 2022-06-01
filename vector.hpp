@@ -39,7 +39,7 @@ class vector {
 	//fill constructor
 	explicit vector (size_type n, const T& val = T(), const allocator_type& alloc = allocator_type()) : _alloc(alloc), _size(n), _cap(n), _data(_alloc.allocate(n)) {
 		for (size_type i = 0; i < _size; i++) {
-			_data[i] = val;
+			_alloc.construct(&_data[i], val);
 		}
 	}
 

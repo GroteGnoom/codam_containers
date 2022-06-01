@@ -13,6 +13,7 @@ void print_avl(void *a , int spaces ) {
 #else
 #	include "vector.hpp"
 #	include "map.hpp"
+#	include "stack.hpp"
 	using namespace ft;
 template <typename T, class Alloc>
 void print_avl(ft::Avlnode<T, Alloc> *a , int spaces ) {
@@ -27,6 +28,7 @@ void print_avl(ft::Avlnode<T, Alloc> *a , int spaces ) {
 
 #endif
 
+#include <deque>
 #include <iostream>
 #include "printing.hpp"
 
@@ -262,12 +264,14 @@ static void elem_acc() {
 }
 
 static void modifiers() {
-	std::cout << "\nModifiers";
+	std::cout << "\nModifiers\n";
 	std::cout << "fill with 10 bla strings: \n";
 	vector<std::string> v(10, "bla");
+	print_vec(v);
 	{
 		std::cout << "replace 3 string with bloe: \n";
 		vector<std::string> v2(3, "bloe");
+		std::cout << "created v2\n";
 		v.assign(v2.begin(), v2.end());
 		print_vec(v);
 	}
@@ -807,10 +811,123 @@ void test_pair() {
 	p1 = make_pair("asf", 7);
 }
 
+#include <stdlib.h>
+
+#define MAX_RAM 4294967296
+#define BUFFER_SIZE 4096
+struct Buffer
+{
+	int idx;
+	char buff[BUFFER_SIZE];
+};
+
+
+#define COUNT (MAX_RAM / (int)sizeof(Buffer))
+
+template<typename T>
+class MutantStack : public ft::stack<T>
+{
+public:
+	MutantStack() {}
+	MutantStack(const MutantStack<T>& src) { *this = src; }
+	MutantStack<T>& operator=(const MutantStack<T>& rhs) 
+	{
+		this->c = rhs.c;
+		return *this;
+	}
+	~MutantStack() {}
+
+	typedef typename ft::stack<T>::container_type::iterator iterator;
+
+	iterator begin() { return this->c.begin(); }
+	iterator end() { return this->c.end(); }
+};
+
+void test_subject_main(int argc, const char* argv[]) {
+	if (argc != 2)
+	{
+		std::cerr << "Usage: ./test seed" << std::endl;
+		std::cerr << "Provide a seed please" << std::endl;
+		std::cerr << "Count value:" << COUNT << std::endl;
+		return exit(1);
+	}
+	const int seed = atoi(argv[1]);
+	srand(seed);
+
+	ft::vector<std::string> vector_str;
+	ft::vector<int> vector_int;
+	ft::stack<int> stack_int;
+	ft::vector<Buffer> vector_buffer;
+	ft::stack<Buffer, std::deque<Buffer> > stack_deq_buffer;
+	ft::map<int, int> map_int;
+
+	std::cout << "pushing into vector\n";
+	for (int i = 0; i < COUNT; i++)
+	{
+		vector_buffer.push_back(Buffer());
+	}
+
+	std::cout << "setting vector\n";
+	for (int i = 0; i < COUNT; i++)
+	{
+		const int idx = rand() % COUNT;
+		vector_buffer[idx].idx = 5;
+	}
+	std::cout << "swapping vectors\n";
+	ft::vector<Buffer>().swap(vector_buffer);
+
+	std::cout << "looking up values with at\n";
+	try
+	{
+		for (int i = 0; i < COUNT; i++)
+		{
+			const int idx = rand() % COUNT;
+			vector_buffer.at(idx);
+			std::cerr << "Error: THIS VECTOR SHOULD BE EMPTY!!" <<std::endl;
+		}
+	}
+	catch(const std::exception& e)
+	{
+		//NORMAL ! :P
+	}
+	
+	std::cout << "map inserts\n";
+	for (int i = 0; i < COUNT; ++i)
+	{
+		map_int.insert(ft::make_pair(rand(), rand()));
+	}
+
+	std::cout << "map element access\n";
+	int sum = 0;
+	for (int i = 0; i < 10000; i++)
+	{
+		int access = rand();
+		sum += map_int[access];
+	}
+	std::cout << "should be constant with the same seed: " << sum << std::endl;
+
+	std::cout << "copy map\n";
+	{
+		ft::map<int, int> copy = map_int;
+	}
+	std::cout << "mutantstack\n";
+	MutantStack<char> iterable_stack;
+	for (char letter = 'a'; letter <= 'z'; letter++)
+		iterable_stack.push(letter);
+	for (MutantStack<char>::iterator it = iterable_stack.begin(); it != iterable_stack.end(); it++)
+	{
+		std::cout << *it;
+	}
+	std::cout << std::endl;
+}
 
 int main() {
 	test_pair();
 	test_vector();
 	test_map();
 	test_reverse_iterator();
+	const char *argv[2];
+	const char *bla = "100";
+	argv[1] = bla;
+	test_subject_main(2, argv);
 }

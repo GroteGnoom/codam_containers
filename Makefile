@@ -5,7 +5,7 @@ INC = vector.hpp map.hpp iterator.hpp
 ifdef DEBUG
 	CC=clang++
 	ASAN_OPTIONS='detect_leaks=1'
-	FLAGS = -Wall -Wextra -fsanitize=address -DDEBUG=1 -g -std=c++98 -pedantic -Wshadow -ferror-limit=1000
+	FLAGS = -Wall -Wextra -fsanitize=address -DDEBUG=1 -g -std=c++98 -pedantic -Wshadow -ferror-limit=1000 -O3
 else
 	CC=c++
 	FLAGS = -Wall -Wextra -Werror -O3

@@ -63,3 +63,9 @@ https://stackoverflow.com/questions/14187006/is-calling-destructor-manually-alwa
 
 pretty important:
 You have to take the structure of each standard container as reference. If a part of the Orthodox Canonical form is missing in it, do not implement it.
+
+cppreference does mention member object c:
+https://en.cppreference.com/w/cpp/container/stack
+
+but cplusplus doesn't:
+https://cplusplus.com/reference/stack/stack/
