@@ -69,3 +69,9 @@ https://en.cppreference.com/w/cpp/container/stack
 
 but cplusplus doesn't:
 https://cplusplus.com/reference/stack/stack/
+
+
+optimizations:
+check all nodes for rebalancing? or only parts where there has been an insertion or deletion?
+use more state in map to make calculations quicker
+
