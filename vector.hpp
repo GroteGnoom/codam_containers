@@ -94,12 +94,15 @@ class vector {
 		if (_size) {
 			clear();
 		}
-		if (_cap)
+		if (_cap && _cap < v._size) {
 			_alloc.deallocate(_data, _cap);
-		_cap = v._cap;
-		_size = v._size;
-		if (_cap)
+			_data = NULL;
+		}
+		if (v._cap && !_data) {
+			_cap = v._cap;
 			_data = _alloc.allocate(_cap);
+		}	
+		_size = v._size;
 		for (size_type i = 0; i < _size; i++) {
 			_alloc.construct(&_data[i], v._data[i]);
 		}

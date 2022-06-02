@@ -2,12 +2,12 @@ NAME = containers
 NAMESUB = containerssub
 SRC = main.cpp
 SRCSUB = subjectmain.cpp
-INC = vector.hpp map.hpp iterator.hpp
+INC = vector.hpp map.hpp iterator.hpp stack.hpp node_iterator.hpp pair.hpp rest.hpp printing.hpp printing.hpp vector_iterator.hpp 
 
 ifdef DEBUG
 	CC=clang++
 	ASAN_OPTIONS='detect_leaks=1'
-	FLAGS = -Wall -Wextra -fsanitize=address -DDEBUG=1 -g -std=c++98 -pedantic -Wshadow -ferror-limit=1000 -O3
+	FLAGS = -Wall -Wextra -fsanitize=address -DDEBUG=1 -g -std=c++98 -pedantic -Wshadow -ferror-limit=1000  -O3
 else
 	CC=c++
 	FLAGS = -Wall -Wextra -Werror -O3
@@ -44,9 +44,9 @@ test:
 	./containers > std_output
 	diff -a std_output output
 	$(MAKE) resub DEBUG=1
-	./containerssub 100 > output
+	time ./containerssub 100 > output
 	$(MAKE) resub STD=1
-	./containerssub 100 > std_output
+	time ./containerssub 100 > std_output
 	#$(MAKE) re DEBUG=1 SRC=test_avl.cpp NAME=test_avl
 	#./test_avl
 
