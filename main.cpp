@@ -461,15 +461,15 @@ static void it_traits() {
 }
 
 template <class T>
-typename enable_if<std::is_integral<T>::value,bool>::type
+static typename enable_if<std::is_integral<T>::value,bool>::type
   is_odd (T i) {return bool(i%2);}
 
 
 template <class T>
-typename enable_if<!std::is_integral<T>::value,bool>::type
+static typename enable_if<!std::is_integral<T>::value,bool>::type
   is_odd (T i) {std::cout << i << " is not integral\n"; return false;}
 
-void check_enable_if() {
+static void check_enable_if() {
 	std::cout << "enable if: \n";
 	double a = 2;
 	std::cout << "double should give a warning and false: \n";
@@ -479,7 +479,7 @@ void check_enable_if() {
 	std::cout << is_odd(b) << "\n";
 }
 
-void rev_it() {
+static void rev_it() {
 	vector<int> v1(4);
 	v1[0] = 0;
 	v1[1] = 1;
@@ -504,7 +504,7 @@ void rev_it() {
 	std::cout << (ri1 - v1.rbegin()) << "\n";
 }
 
-void typedefs() {
+static void typedefs() {
 #define check_type(a) do {(void)sizeof(vector<int>::a);} while (0)
 	check_type(value_type);
 	check_type(allocator_type);
@@ -521,7 +521,7 @@ void typedefs() {
 #undef check_type
 }
 
-void test_vector() {
+static void test_vector() {
 	typedefs();
 	con_def_ass();
 	iter();
@@ -536,7 +536,7 @@ void test_vector() {
 }
 
 template <class Key, class T>
-Key it_to_key(typename map<Key, T>::iterator it, map<Key, T> &m) {
+static Key it_to_key(typename map<Key, T>::iterator it, map<Key, T> &m) {
 	if (it == m.end()) {
 		std::cout << "iterator at end!\n";
 		return Key();
@@ -545,7 +545,7 @@ Key it_to_key(typename map<Key, T>::iterator it, map<Key, T> &m) {
 }
 
 
-void print_elems(map<std::string, int> &m) {
+static void print_elems(map<std::string, int> &m) {
 	for (map<std::string, int>::iterator first = m.begin(); first != m.end(); first++) {
 		std::cout << first->first << " " << first->second << "\n";
 	}
@@ -647,10 +647,10 @@ static void test_map_element_access() {
 	std::cout << "What is its size? " << m.size() << "\n";
 
 	//test adding only one element
-	//map<std::string, int> m2; TODO
-	//m2["aa"] = 10;
-	//map<std::string, int> m3;
-	//m3["aabbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"] = 10;
+	map<std::string, int> m2;
+	m2["aa"] = 10;
+	map<std::string, int> m3;
+	m3["aabbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"] = 10;
 }
 
 static void test_map_modifiers() {
@@ -780,7 +780,7 @@ static void test_reverse_iterator() {
 	std::cout << *(1 + ri1) << "\n";
 }
 
-void test_stack() {
+static void test_stack() {
 	stack<std::string> s;
 	std::cout << s.empty() << "\n";
 	std::cout << s.size() << "\n";
@@ -797,7 +797,7 @@ void test_stack() {
 	std::cout << (s != s2) << "\n";
 }
 
-void test_map() {
+static void test_map() {
 #define check_type(a) do {(void)sizeof(map<std::string, int>::a);} while (0)
 	check_type(key_type);
 	check_type(mapped_type);
@@ -826,7 +826,7 @@ void test_map() {
 	test_map_allocator();
 }
 
-void test_pair() {
+static void test_pair() {
 	pair<std::string, int> p1;
 	pair<std::string, int> p2 ("bla", 5);
 	pair<std::string, int> p3(p2);
