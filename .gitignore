@@ -11,6 +11,12 @@ test.c
 output
 std_output
 containers
+containerssub
 captest.cpp
 test_avl
 ext
+instruments*
+origsubjectmain.cpp
+subm.cpp
+test.cpp
+tests.hpp
