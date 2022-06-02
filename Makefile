@@ -1,5 +1,7 @@
 NAME = containers
+NAMESUB = containerssub
 SRC = main.cpp
+SRCSUB = subjectmain.cpp
 INC = vector.hpp map.hpp iterator.hpp
 
 ifdef DEBUG
@@ -16,11 +18,16 @@ ifdef STD
 endif
 
 OBJ = $(SRC:.cpp=.o)
+OBJSUB = $(SRCSUB:.cpp=.o)
 
 all: $(NAME)
+allsub: $(NAMESUB)
 
 $(NAME): $(OBJ)
 	$(CC) $(FLAGS) $(OBJ) -o $(NAME)
+
+$(NAMESUB): $(OBJSUB)
+	$(CC) $(FLAGS) $(OBJSUB) -o $(NAMESUB)
 
 %.o: %.cpp $(INC)
 	$(CC) $(FLAGS) -c $< -o $@
@@ -36,6 +43,10 @@ test:
 	./containers > std_output
 	diff -a std_output output
 	$(MAKE) -C ext #TODO remove
+	$(MAKE) resub DEBUG=1
+	./containerssub 100 > output
+	$(MAKE) resub STD=1
+	./containerssub 100 > std_output
 	#$(MAKE) re DEBUG=1 SRC=test_avl.cpp NAME=test_avl
 	#./test_avl
 
@@ -49,4 +60,11 @@ fclean: clean
 	rm -f $(NAME)
 
 re: fclean all
+cleansub:
+	rm -f $(OBJSUB)
+
+fcleansub: cleansub
+	rm -f $(NAMESUB)
+
+resub: fcleansub allsub
 .PHONY: all clean fclean re

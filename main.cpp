@@ -5,6 +5,7 @@
 #	include <iterator>
 #	include <typeinfo>
 #	include <map>
+#	include <stack>
 template <typename T>
 void print_avl(void *a , int spaces ) {
 	(void) a;
@@ -559,9 +560,16 @@ static void test_map_constructors() {
 	std::cout << "copy constructor:\n";
 	map<std::string, int> m2 = m;
 	std::cout << "after copy constructor:\n";
+	std::cout << "map m:\n";
+	print_elems(m);
+	std::cout << "map m2:\n";
+	print_elems(m2);
 	m2["d"] = 4;
 	m2["c"] = 5;
+	std::cout << "after adding two things to m2:\n";
+	std::cout << "map m:\n";
 	print_elems(m);
+	std::cout << "map m2:\n";
 	print_elems(m2);
 	map<std::string, int> m3;
 	m3 = m;
@@ -637,6 +645,12 @@ static void test_map_element_access() {
 	m.erase("a");
 	std::cout << "after erasing a is " << m["a"] << "\n";
 	std::cout << "What is its size? " << m.size() << "\n";
+
+	//test adding only one element
+	//map<std::string, int> m2; TODO
+	//m2["aa"] = 10;
+	//map<std::string, int> m3;
+	//m3["aabbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"] = 10;
 }
 
 static void test_map_modifiers() {
@@ -766,6 +780,23 @@ static void test_reverse_iterator() {
 	std::cout << *(1 + ri1) << "\n";
 }
 
+void test_stack() {
+	stack<std::string> s;
+	std::cout << s.empty() << "\n";
+	std::cout << s.size() << "\n";
+	s.push("bla");
+	std::cout << s.top() << "\n";
+	std::cout << s.empty() << "\n";
+	std::cout << s.size() << "\n";
+	stack<std::string> s2;
+	std::cout << (s < s2) << "\n";
+	std::cout << (s > s2) << "\n";
+	std::cout << (s <= s2) << "\n";
+	std::cout << (s >= s2) << "\n";
+	std::cout << (s == s2) << "\n";
+	std::cout << (s != s2) << "\n";
+}
+
 void test_map() {
 #define check_type(a) do {(void)sizeof(map<std::string, int>::a);} while (0)
 	check_type(key_type);
@@ -811,123 +842,13 @@ void test_pair() {
 	p1 = make_pair("asf", 7);
 }
 
-#include <stdlib.h>
-
-#define MAX_RAM 4294967296
-#define BUFFER_SIZE 4096
-struct Buffer
-{
-	int idx;
-	char buff[BUFFER_SIZE];
-};
-
-
-#define COUNT (MAX_RAM / (int)sizeof(Buffer))
-
-template<typename T>
-class MutantStack : public ft::stack<T>
-{
-public:
-	MutantStack() {}
-	MutantStack(const MutantStack<T>& src) { *this = src; }
-	MutantStack<T>& operator=(const MutantStack<T>& rhs) 
-	{
-		this->c = rhs.c;
-		return *this;
-	}
-	~MutantStack() {}
-
-	typedef typename ft::stack<T>::container_type::iterator iterator;
-
-	iterator begin() { return this->c.begin(); }
-	iterator end() { return this->c.end(); }
-};
-
-void test_subject_main(int argc, const char* argv[]) {
-	if (argc != 2)
-	{
-		std::cerr << "Usage: ./test seed" << std::endl;
-		std::cerr << "Provide a seed please" << std::endl;
-		std::cerr << "Count value:" << COUNT << std::endl;
-		return exit(1);
-	}
-	const int seed = atoi(argv[1]);
-	srand(seed);
-
-	ft::vector<std::string> vector_str;
-	ft::vector<int> vector_int;
-	ft::stack<int> stack_int;
-	ft::vector<Buffer> vector_buffer;
-	ft::stack<Buffer, std::deque<Buffer> > stack_deq_buffer;
-	ft::map<int, int> map_int;
-
-	std::cout << "pushing into vector\n";
-	for (int i = 0; i < COUNT; i++)
-	{
-		vector_buffer.push_back(Buffer());
-	}
-
-	std::cout << "setting vector\n";
-	for (int i = 0; i < COUNT; i++)
-	{
-		const int idx = rand() % COUNT;
-		vector_buffer[idx].idx = 5;
-	}
-	std::cout << "swapping vectors\n";
-	ft::vector<Buffer>().swap(vector_buffer);
-
-	std::cout << "looking up values with at\n";
-	try
-	{
-		for (int i = 0; i < COUNT; i++)
-		{
-			const int idx = rand() % COUNT;
-			vector_buffer.at(idx);
-			std::cerr << "Error: THIS VECTOR SHOULD BE EMPTY!!" <<std::endl;
-		}
-	}
-	catch(const std::exception& e)
-	{
-		//NORMAL ! :P
-	}
-	
-	std::cout << "map inserts\n";
-	for (int i = 0; i < COUNT; ++i)
-	{
-		map_int.insert(ft::make_pair(rand(), rand()));
-	}
-
-	std::cout << "map element access\n";
-	int sum = 0;
-	for (int i = 0; i < 10000; i++)
-	{
-		int access = rand();
-		sum += map_int[access];
-	}
-	std::cout << "should be constant with the same seed: " << sum << std::endl;
-
-	std::cout << "copy map\n";
-	{
-		ft::map<int, int> copy = map_int;
-	}
-	std::cout << "mutantstack\n";
-	MutantStack<char> iterable_stack;
-	for (char letter = 'a'; letter <= 'z'; letter++)
-		iterable_stack.push(letter);
-	for (MutantStack<char>::iterator it = iterable_stack.begin(); it != iterable_stack.end(); it++)
-	{
-		std::cout << *it;
-	}
-	std::cout << std::endl;
-}
-
 int main() {
 	test_pair();
 	test_vector();
 	test_map();
+	test_stack();
 	test_reverse_iterator();
 	const char *argv[2];
 	const char *bla = "100";
 	argv[1] = bla;
-	test_subject_main(2, argv);
 }

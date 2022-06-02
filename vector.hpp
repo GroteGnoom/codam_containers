@@ -66,7 +66,7 @@ class vector {
 	//copy constructor
 	vector (const vector& v) : _alloc(v._alloc), _size(v._size), _cap(v._cap), _data(_alloc.allocate(_cap)) {
 		for (size_type i = 0; i < _size; i++) {
-			_data[i] = v._data[i];
+			_alloc.construct(&_data[i], v._data[i]);
 		}
 	}
 
@@ -85,17 +85,21 @@ class vector {
 	}
 
 	//copy assignment
-	vector &operator=(const vector& v) {
-		if (_cap < v._cap) {
-			this->~vector<T>();
-			_data = _alloc.allocate(v._cap);
-			_cap = v._cap;
-		}
 		//https://www.cplusplus.com/reference/vector/vector/operator=/
-		//The container preserves its current allocator, which is used to allocate storage in case of reallocation.
+		//The container preserves its current allocator, 
+		//which is used to allocate storage in case of reallocation.
+		//these were already constructed
+	vector &operator=(const vector& v) {
+		if (this == &v)
+			return(*this);
+		if (_size) {
+			clear();
+		}
+		_cap = v._cap;
 		_size = v._size;
+		_data = _alloc.allocate(_cap);
 		for (size_type i = 0; i < _size; i++) {
-			_data[i] = v._data[i];
+			_alloc.construct(&_data[i], v._data[i]);
 		}
 		return (*this);
 	}
@@ -226,10 +230,13 @@ class vector {
 	//assign fill
 	void assign (size_type n, const value_type& val) {
 		reserve(n);
-		_size = n;
 		for (size_type i = 0; i < n; i++) {
-			_data[i] = val;
+			if (i < _size)
+				_data[i] = val;
+			else
+				_alloc.construct(&_data[_size], val);
 		}
+		_size = n;
 	}
 
 
@@ -242,7 +249,7 @@ class vector {
 			else
 				reserve(_cap + 1);
 		}
-		_data[_size] = val;
+		_alloc.construct(&_data[_size], val);
 		_size++;
 	}
 	//If the container is not empty, the function never throws exceptions (no-throw guarantee).

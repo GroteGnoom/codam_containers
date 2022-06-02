@@ -32,8 +32,20 @@ template <class T, class Container = vector<T> > class stack {
 	void push (const value_type& val) {c.push_back(val);};
 
 	void pop() {c.pop_back();};
+//https://stackoverflow.com/questions/23335209/error-overloaded-operator-must-be-a-binary-operator-has-3-parameters
+//https://www.reddit.com/r/cpp_questions/comments/3lc6om/operator_must_be_a_binary_operator_has_3/
+#define op(a) bool operator a (const stack& rhs) { return c a rhs.c; }
+
+op(==)
+op(!=)
+op(<)
+op(<=)
+op(>)
+op(>=)
+#undef op
 };
 
+/*
 //Non-member function overloads
 #define op(a) template <class T, class Container> bool operator a (const stack<T,Container>& lhs, const stack<T,Container>& rhs) { return lhs.c a rhs.c; }
 
@@ -44,6 +56,7 @@ op(<=)
 op(>)
 op(>=)
 
+*/
 }
 
 #endif

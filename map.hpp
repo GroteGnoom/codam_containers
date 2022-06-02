@@ -107,6 +107,7 @@ struct Avlnode {
 	}
 	void del() {
 			this->~Avlnode();
+			node_alloc.destroy(this);
 			node_alloc.deallocate(this, 1);
 	}
 	void del_children() {
@@ -565,11 +566,22 @@ class map {
 		}
 	}
 
+	void copy_recur(node *a, node* b) {
+		if (b->_right) {
+			a->_right = a->newnode(b->_right->_elem);
+			copy_recur(a->_right, b->_right);
+		}
+		if (b->_left) {
+			a->_left = a->newnode(b->_left->_elem);
+			copy_recur(a->_left, b->_left);
+		}
+	}
 	//copy
 	map (const map& x) : _comp(x._comp), _alloc(x._alloc) {
 		init();
-		for (const_iterator first = x.begin(); first != x.end(); first++) {
-			insert(*first);
+		if (x._root) {
+			insert(x._root->_elem);
+			copy_recur(_root, x._root);
 		}
 	}
 	//destructor
