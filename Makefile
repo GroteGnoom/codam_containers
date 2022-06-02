@@ -37,12 +37,12 @@ pretest:
 	./containers
 
 test:
+	$(MAKE) -C ext #TODO remove
 	$(MAKE) re DEBUG=1
 	./containers > output
 	$(MAKE) re STD=1
 	./containers > std_output
 	diff -a std_output output
-	$(MAKE) -C ext #TODO remove
 	$(MAKE) resub DEBUG=1
 	./containerssub 100 > output
 	$(MAKE) resub STD=1

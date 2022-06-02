@@ -59,7 +59,7 @@ class vector {
 				throw std::length_error("vector");
 			}
 			for (size_type i = 0; first < last; first++) {
-				_data[i++] = *first;
+				_alloc.construct(&_data[i++], *first);
 			}
 		}
 
@@ -72,7 +72,6 @@ class vector {
 
 	//destructor
 	~vector() {
-		resize(0);
 		if (_size) {
 			clear();
 		}
@@ -95,9 +94,12 @@ class vector {
 		if (_size) {
 			clear();
 		}
+		if (_cap)
+			_alloc.deallocate(_data, _cap);
 		_cap = v._cap;
 		_size = v._size;
-		_data = _alloc.allocate(_cap);
+		if (_cap)
+			_data = _alloc.allocate(_cap);
 		for (size_type i = 0; i < _size; i++) {
 			_alloc.construct(&_data[i], v._data[i]);
 		}
@@ -139,7 +141,7 @@ class vector {
 	void resize(size_type n, value_type val = value_type()) {
 		if (n < _size) {
 			for (size_type i = n; i < _size; i++) {
-				_data[i].~T();
+				_alloc.destroy(&_data[i]);
 			}
 			_size = n;
 		} else {
@@ -148,7 +150,7 @@ class vector {
 				newcap = std::max(n, _cap * 2);
 			reserve(newcap);
 			for (size_type i = _size; i < n; i++) {
-				_data[i] = val;
+				_alloc.construct(&_data[i], val);
 			}
 			_size = n;
 			_cap = newcap;
@@ -167,8 +169,8 @@ class vector {
 		if (n > _cap) {
 			T* new_data = _alloc.allocate(n);
 			for (size_type i = 0; i < _size; i++) {
-				new_data[i] = _data[i];
-				_data[i].~T();
+				_alloc.construct(&new_data[i], _data[i]);
+				_alloc.destroy(&_data[i]);
 			}
 			_alloc.deallocate(_data, _cap);
 			_data = new_data;
@@ -220,23 +222,20 @@ class vector {
 			if (!(first < last) && !(first == last)) {
 				throw std::length_error("vector");
 			}
-			reserve(last - first);
-			_size = last - first;
-			for (size_type i = 0; first < last; first++) {
-				_data[i++] = *first;
+			reserve(last - first); //so it's exact
+			resize(last - first);
+			for (size_type i = 0; i < _size; i++) {
+				_data[i] = first[i];
 			}
 		}
 
 	//assign fill
 	void assign (size_type n, const value_type& val) {
-		reserve(n);
+		reserve(n); //so it's exact
+		resize(n);
 		for (size_type i = 0; i < n; i++) {
-			if (i < _size)
-				_data[i] = val;
-			else
-				_alloc.construct(&_data[_size], val);
+			_data[i] = val;
 		}
-		_size = n;
 	}
 
 

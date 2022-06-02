@@ -106,7 +106,6 @@ struct Avlnode {
 		return node;
 	}
 	void del() {
-			this->~Avlnode();
 			node_alloc.destroy(this);
 			node_alloc.deallocate(this, 1);
 	}
