@@ -37,21 +37,18 @@ pretest:
 	./containers
 
 test:
-	$(MAKE) -C ext #TODO remove
+	#$(MAKE) -C ext
+	$(MAKE) resub DEBUG=1
+	time ./containerssub 100 > output
+	$(MAKE) resub STD=1
+	time ./containerssub 100 > std_output
 	$(MAKE) re DEBUG=1
 	./containers > output
 	$(MAKE) re STD=1
 	./containers > std_output
 	diff -a std_output output
-	$(MAKE) resub DEBUG=1
-	time ./containerssub 100 > output
-	$(MAKE) resub STD=1
-	time ./containerssub 100 > std_output
 	#$(MAKE) re DEBUG=1 SRC=test_avl.cpp NAME=test_avl
 	#./test_avl
-
-fast:
-	$(MAKE) -C ext #TODO remove
 
 clean:
 	rm -f $(OBJ)
